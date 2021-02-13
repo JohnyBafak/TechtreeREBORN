@@ -1,6 +1,0 @@
-<root>
-    <id>jb.getTank</id>
-    <version>0.1.2</version>
-    <name>ATT: GetTanks</name>
-    <description>Extends in-game TechTree</description>
-</root>
