@@ -1,2 +1,4 @@
 # Ignore random files
 _*
+build/meta.xml
+*.pyc

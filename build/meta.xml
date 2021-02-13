@@ -1,6 +1,6 @@
 <root>
-    <id>AdvTechTree</id>
+    <id>jb.getTank</id>
     <version>0.1.2</version>
-    <name>Advanced TechTree</name>
+    <name>ATT: GetTanks</name>
     <description>Extends in-game TechTree</description>
 </root>
