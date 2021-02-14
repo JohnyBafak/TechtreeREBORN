@@ -1,4 +1,4 @@
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 """ 
  TankAvailable by Johny_Bafak
  http://forum.worldoftanks.eu/index.php?/topic/514277-
@@ -11,32 +11,41 @@ sGetTanks = vehicles_core.VehicleList()
 
 gPath = ResMgr.openSection('../paths.xml')['Paths'].values()[0:2][0].asString
 
-ATR = [ "premium", "premiumIGR", "secret", "fallout", "bob", 'collectorVehicle', "HD",
-        'lightTank', 'mediumTank', 'heavyTank', 'SPG', 'AT-SPG' ] 
-
-def tagClear(data, atr=[], res=[]):
+"""def tagClear(data, atr=[], res=[]):
+    recursion = overkill
     if len(atr):
         tag = atr[0]
         if tag in data:
             data.remove(tag)
             res.append(True)
         else:
-            if tag == "HD":
-                print "HD not in", data
             res.append(False)
         atr.pop(0)
         tagClear(data,atr,res)
+    return res, data"""
+    
+def tagClear(data, atr=[], res=[]):
+    for i in atr:
+        if i in data:
+            data.remove(i)
+            res.append(True)
+        else:
+            res.append(False)
     return res, data
           
 def sNationLoad(natID):
     tanks = sGetTanks.getList(natID)
     with open(gPath + '_tankList.csv', 'a') as f:
+        
+        clear = [ "premium", "premiumIGR", "secret", "fallout", "bob", 'collectorVehicle', "HD",
+                    'lightTank', 'mediumTank', 'heavyTank', 'SPG', 'AT-SPG' ] 
+        
         for k, v in tanks.iteritems():
             iNat, iNam = v.name.split(":")
             
             vehicleTags = list(v.tags)
-            clear = list(ATR)
             tag, vehicleTags = tagClear(vehicleTags, clear,[])         
+            #tag, vehicleTags = tagClear(vehicleTags, [])         
                            
             cls = vehicles_core.getVehicleClassFromVehicleType(v)
             #         1, 2,   3, 4, 5, 6, 7, 8, 9,10,11,12,13
