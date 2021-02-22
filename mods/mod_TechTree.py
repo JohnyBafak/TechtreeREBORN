@@ -1,12 +1,15 @@
-﻿__version__ = "0.0.1"
+﻿__version__ = "0.1.0"
 """ 
  Advanced TechTree by Johny_Bafak
  http://forum.worldoftanks.eu/index.php?/topic/514277-
  
  Functionality:
-    28      override 
-    60      preview for all tanks
-    80      unlock comparison
+    @override 
+    preview for all tanks
+    unlock comparison
+    techtree class
+        load all tanks
+        set node state
     
     
 """
@@ -123,16 +126,45 @@ class aTechTree():
     
     def _makeRealExposedNode(hook, baseFunc, self, node, guiItem, unlockStats, displayInfo):
         """ techtree.data.NationTreeData._makeRealExposedNode """
-        print hook
-        print baseFunc
-        print self
         data = baseFunc(self, node, guiItem, unlockStats, displayInfo)
         if guiItem.isHidden and not guiItem.isInInventory:
-            print data.getState()
-            #data._ExposedNode__state = 1
-            data.setState(1)
-            print data.getState()
+            #scripts\client\gui\Scaleform\genConsts\NODE_STATE_FLAGS.py
+            if guiItem.isPremium:
+                data.setState(256)  #WAS_IN_BATTLE == no buy button
         return data
          
 Vehicle.isPreviewAllowed = isPreviewAllowed
 aTT = aTechTree()
+
+""" class NODE_STATE_FLAGS(object):
+    LOCKED = 1
+    NEXT_2_UNLOCK = 2
+    UNLOCKED = 4
+    ENOUGH_XP = 8
+    ENOUGH_MONEY = 16
+    IN_INVENTORY = 32
+    WAS_IN_BATTLE = 64
+    ELITE = 128
+    PREMIUM = 256
+    SELECTED = 512
+    AUTO_UNLOCKED = 1024
+    INSTALLED = 2048
+    ACTION = 4096
+    CAN_SELL = 8192
+    VEHICLE_CAN_BE_CHANGED = 16384
+    VEHICLE_IN_RENT = 32768
+    VEHICLE_RENTAL_IS_OVER = 65536
+    PURCHASE_DISABLED = 131072
+    RESTORE_AVAILABLE = 262144
+    RENT_AVAILABLE = 524288
+    DASHED = 1048576
+    CAN_TRADE_IN = 2097152
+    CAN_TRADE_OFF = 4194304
+    NOT_CLICKABLE = 8388608
+    ANNOUNCEMENT = 16777216
+    BLUEPRINT = 33554432
+    LAST_2_BUY = 67108864
+    COLLECTIBLE = 134217728
+    COLLECTIBLE_ACTION = 268435456
+    HAS_TECH_TREE_EVENT = 536870912
+    TECH_TREE_EVENT_DISCOUNT_ONLY = 1073741824"""
