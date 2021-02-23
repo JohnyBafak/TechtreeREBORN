@@ -1,4 +1,4 @@
-__version__ = "0.1.3"
+__version__ = "0.2"
 """ 
  TankAvailable by Johny_Bafak
  http://forum.worldoftanks.eu/index.php?/topic/514277-
