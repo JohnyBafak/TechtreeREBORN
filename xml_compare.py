@@ -3,42 +3,45 @@
     ----------
     http://forum.worldoftanks.eu/index.php?/topic/514277-
     Check layouts for missing tanks.
+    
+    Usage:  @param1 = layout folder name
+            @param2 = WoT install directory
 
     Licensed under CC BY-NC-SA 4.0
-    
-    v0.2
 """
-WOT = "D:/World_of_Tanks_EU"
+__version__ = "0.2.1"
 NATIONS = [ "czech", "france", "germany", "china", "italy", "japan", "poland", "sweden", "uk", "usa", "ussr" ]
 
 from xml.etree import cElementTree as ET
-import os, time
+import sys, os, time
 
-def getVersion():
-    """ Check paths.xml for current game version """
-    p = 'fail'
-    path = WOT +'/paths.xml'
-    tree = ET.parse(path)
-    p = tree.find("Paths")[0].text.split('mods/')[1]
-    return p   
+def getVersion(game):
+        """ Check paths.xml for current game version """
+        p = 'fail'
+        path = game + '/paths.xml'
+        tree = ET.parse(path)
+        p = tree.find("Paths")[0].text.split('mods/')[1]
+        return p   
 
 class Compare():
-    def __init__(self, name = ""):
+    
+    def __init__(self, name = "", folder = "D:/World_of_Tanks_EU"):
         self.LAYOUT = {}
         self.GAME = {nation: {} for nation in NATIONS}
         for nation in NATIONS:
             self.LAYOUT[nation] = self.readLayout(nation, name)
         
-        ver = getVersion()
-        self.readGame(ver)
+        ver = getVersion(folder)
+        self.readGame(folder, ver)
         self.checkDiff(name,ver)
+        
+        print "Done."
 
-    def readGame(self, ver):
+    def readGame(self, WOT, ver):
         fname = '{}/res_mods/{}_tankList.csv'.format( WOT, ver )
         if os.path.isfile( fname ):
             with open(fname) as f:
                 delim = f.readline()[6]  
-                raw_input(delim)
                 for line in f:
                     X = line.rstrip().split(delim)
                     nat = X[0]
@@ -79,7 +82,8 @@ class Compare():
         nationList.sort()
         
         return nationList
-    
-Compare()
-print "Done."
-time.sleep(1)
+
+
+if __name__ == "__main__":
+    Compare(*sys.argv[1:])
+    time.sleep(1)
