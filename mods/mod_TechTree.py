@@ -96,9 +96,6 @@ class aTechTree():
         #override NationTreeData
         override(NationTreeData, 'load', self.load)
         override(NationTreeData, '_makeRealExposedNode', self._makeRealExposedNode)
-        
-        #override techtree_dp
-        
     
     def load(hook, baseFunc, self, nationID, override = None):
         """ techtree.data.NationTreeData.load """

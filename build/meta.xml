@@ -1,6 +1,6 @@
 <root>
     <id>jb.TechTree</id>
-    <version>0.0.1</version>
+    <version>0.1.0</version>
     <name>Advanced TechTree</name>
     <description>Extends in-game TechTree</description>
 </root>

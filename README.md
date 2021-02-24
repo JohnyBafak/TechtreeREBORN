@@ -5,11 +5,6 @@
 - allow preview for all tanks available in client
 - show all tanks in techtree
 
-### v0.1.0 In Progress & TO-DO:
- - repopulate nations with colectible tanks (left: germany, uk, usa, ussr)
- - fich reseach page bug
- - rework vehicle techtree placement 
-
 ## jb.getTanks
 - scan game for all available vehicles currently in game
 - creates report in form of CSV file in res_mods/<current_version>
@@ -30,7 +25,13 @@ As of v0.1.2 the list includes following:
 - collectorVehicle
 - *any remaing unresolved tag
 
-### TO-DO:
- - examine layouts for missing vehicles (sub-mod without game running)
+# TO-DO:
+ - fix resear page issue for not-previewable vehicles
+ - update _build.py for releasing obfuscated mod
+ - remake techtree_generator
+ - add configuration
+ - implement UI configuration window
+ - rework vehicle techtree placement 
+ - L10n
 
 
