@@ -1,7 +1,7 @@
 <uk-premium.xml>
 <settings>normal</settings>
 <grid>grid_1
- <rows> 5</rows>
+ <rows> 9</rows>
  <columns>10</columns>
 </grid>
 <nodes>
@@ -31,10 +31,10 @@
  <GB93_Caernarvon_AX>			<row> 3</row><column> 8</column></GB93_Caernarvon_AX>
  <GB99_Turtle_Mk1>				<row> 4</row><column> 8</column></GB99_Turtle_Mk1>
  <GB87_Chieftain_T95_turret>	<row> 5</row><column> 8</column></GB87_Chieftain_T95_turret>
- <GB97_Chimera>					<row> 6</row><column> 8</column></GB97_Chimera>
- <GB101_FV1066_Senlac>			<row> 7</row><column> 8</column></GB101_FV1066_Senlac>
- <GB109_GSOR_1008>				<row> 8</row><column> 8</column></GB109_GSOR_1008>
- <GB111_Charlemagne>			<row> 9</row><column> 8</column></GB111_Charlemagne>
+ <GB97_Chimera>					<row> 2</row><column> 9</column></GB97_Chimera>
+ <GB101_FV1066_Senlac>			<row> 3</row><column> 9</column></GB101_FV1066_Senlac>
+ <GB109_GSOR_1008>				<row> 4</row><column> 9</column></GB109_GSOR_1008>
+ <GB111_Charlemagne>			<row> 5</row><column> 9</column></GB111_Charlemagne>
  
  <GB106_Cobra>					<row> 1</row><column> 9</column></GB106_Cobra>
  

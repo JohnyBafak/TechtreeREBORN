@@ -1,7 +1,7 @@
 <china-premium.xml>
 <settings>normal</settings>
 <grid>grid_1
- <rows> 7</rows>
+ <rows> 5</rows>
  <columns>10</columns>
 </grid>
 <nodes>
@@ -19,9 +19,9 @@
  <Ch23_112>						<row> 2</row><column> 8</column></Ch23_112>
  <Ch26_59_Patton>				<row> 3</row><column> 8</column></Ch26_59_Patton>
  <Ch03_WZ-111>					<row> 4</row><column> 8</column></Ch03_WZ-111>
- <Ch14_T34_3>					<row> 5</row><column> 8</column></Ch14_T34_3>
- <Ch01_Type59>					<row> 6</row><column> 8</column></Ch01_Type59>
- <Ch42_WalkerBulldog_M41D>		<row> 7</row><column> 8</column></Ch42_WalkerBulldog_M41D>
+ <Ch14_T34_3>					<row> 4</row><column> 7</column></Ch14_T34_3>
+ <Ch01_Type59>					<row> 1</row><column>10</column></Ch01_Type59>
+ <Ch42_WalkerBulldog_M41D>		<row> 1</row><column>10</column></Ch42_WalkerBulldog_M41D>
  <Ch40_WZ120G_FT>				<row> 1</row><column> 9</column></Ch40_WZ120G_FT>
 </nodes>
 </china-premium.xml>

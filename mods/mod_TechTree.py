@@ -1,4 +1,4 @@
-﻿__version__ = "0.1.0"
+﻿__version__ = "0.1.1"
 """ 
  Advanced TechTree by Johny_Bafak
  http://forum.worldoftanks.eu/index.php?/topic/514277-
@@ -24,6 +24,7 @@ import gui.game_control.veh_comparison_basket
 from gui.shared.utils.requesters.ItemsRequester import REQ_CRITERIA
 # TechTree
 from gui.Scaleform.daapi.view.lobby.techtree.techtree_dp import g_techTreeDP
+from gui.Scaleform.daapi.view.lobby.techtree.techtree_page import TechTree
 from gui.Scaleform.daapi.view.lobby.techtree.data import NationTreeData, ResearchItemsData
 from gui.Scaleform.genConsts.NODE_STATE_FLAGS import NODE_STATE_FLAGS
 
@@ -93,9 +94,9 @@ class aTechTree():
     
     def __init__(self):
         """ aTechTree main function class """
-        #override NationTreeData
-        override(NationTreeData, 'load', self.load)
-        override(NationTreeData, '_makeRealExposedNode', self._makeRealExposedNode)
+        override(NationTreeData, 'load', self.load)                                     # Add all nodes
+        override(NationTreeData, '_makeRealExposedNode', self._makeRealExposedNode)     # Node display info
+        override(TechTree, 'goToNextVehicle', self.goToNextVehicle)                     # Reseasch page crash
     
     def load(hook, baseFunc, self, nationID, override = None):
         """ techtree.data.NationTreeData.load """
@@ -110,6 +111,7 @@ class aTechTree():
             if node.isAnnouncement:
                 self._addNode(nodeCD, self._makeAnnouncementNode(node, displayInfo))
             item = getItem(nodeCD)
+            print item
             ##if item.isHidden:
             ##    continue
             index = self._addNode(nodeCD, self._makeRealExposedNode(node, item, unlockStats, displayInfo))
@@ -129,6 +131,14 @@ class aTechTree():
             if guiItem.isPremium:
                 data.setState(256)  #WAS_IN_BATTLE == no buy button
         return data
+        
+            
+    def goToNextVehicle(hook, baseFunc, self, vehCD):
+        item = self._data.getItem(int(vehCD))
+        print item.isPreviewAllowed()
+        if item.isPreviewAllowed():
+            baseFunc(self, vehCD)
+        
          
 Vehicle.isPreviewAllowed = isPreviewAllowed
 aTT = aTechTree()
