@@ -6,9 +6,11 @@
     
     Usage:  @param1 = layout folder name
             @param2 = WoT install directory
-            @param3 = ignore IGR
-            @param4 = ignore bot & bootcamp & training
-            @param5 = ignore bob&fallout
+            @param3 = ignore IGR (IGR rental acc vehicles)
+            @param4 = ignore bootcamp (bot, bootcamp, training)
+            @param5 = ignore bob&fallout (bob, fallout)
+            @param6 = ignore only for epic battle (FL)
+            @param7 = ignore battle royalle (SH)
             
 
     Licensed under CC BY-NC-SA 4.0
@@ -28,7 +30,7 @@ def getVersion(game):
         p = tree.find("Paths")[0].text.split('mods/')[1]
         return p   
         
-def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True):
+def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = True):
     ver = getVersion(WOT)
     fname = '{}/res_mods/{}_tankList.csv'.format( WOT, ver )
     global GAME
@@ -39,14 +41,18 @@ def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True):
                 X = line.rstrip().split(delim)
                 nat = X[0]
                 name = X[1]
-                if IGR and "_IGR" in name: continue
+                if IGR and name.endswith("_IGR"): continue
                 if bot:
                     if "_bot" in name: continue
                     elif "_bootcamp" in name: continue
                     elif "_training" in name: continue
                 if bob:
-                    if "_bob" in name: continue
-                    elif "_fallout" in name: continue
+                    if name.endswith("_bob"): continue
+                    elif name.endswith("_fallout"): continue
+                if FL:
+                    if name.endswith("_FL"):    continue
+                if SH:
+                    if name.endswith("_SH"):    continue
                 
                 val = { "lvl": X[5], "cls": X[6] , "gold": X[7] , "hid":X[9] }
                 GAME[nat][name] = val
