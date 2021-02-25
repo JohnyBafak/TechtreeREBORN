@@ -9,8 +9,8 @@
  <F19_Lorraine40t>				<row> 1</row><column> 1</column></F19_Lorraine40t>
  <F74_AMX_M4_1949_Liberte>		<row> 2</row><column> 1</column></F74_AMX_M4_1949_Liberte>
  <F84_Somua_SM>					<row> 3</row><column> 1</column></F84_Somua_SM>
- <F106_Panhard_EBR_75_Mle1954>	<row> 4</row><column> 1</column></F106_Panhard_EBR_75_Mle1954>
- <F116_Bat_Chatillon_Bourrasque><row> 5</row><column> 1</column></F116_Bat_Chatillon_Bourrasque>
+ <F106_Panhard_EBR_75_Mle1954>	<row> 2</row><column> 2</column></F106_Panhard_EBR_75_Mle1954>
+ <F116_Bat_Chatillon_Bourrasque><row> 3</row><column> 2</column></F116_Bat_Chatillon_Bourrasque>
  
  
  <F111_AM39_Gendron_Somua>		<row> 1</row><column> 2</column></F111_AM39_Gendron_Somua>
@@ -31,8 +31,8 @@
  <F74_AMX_M4_1949>				<row> 2</row><column> 8</column></F74_AMX_M4_1949>
  <F73_M4A1_Revalorise>			<row> 3</row><column> 8</column></F73_M4A1_Revalorise>
  <F89_Canon_dassaut_de_105>		<row> 4</row><column> 8</column></F89_Canon_dassaut_de_105>
- <F68_AMX_Chasseur_de_char_46>	<row> 5</row><column> 8</column></F68_AMX_Chasseur_de_char_46>
- <F65_FCM_50t>					<row> 6</row><column> 8</column></F65_FCM_50t>
+ <F68_AMX_Chasseur_de_char_46>	<row> 4</row><column> 7</column></F68_AMX_Chasseur_de_char_46>
+ <F65_FCM_50t>					<row> 3</row><column> 7</column></F65_FCM_50t>
  
  <F114_Projet_4_1>				<row> 1</row><column> 9</column></F114_Projet_4_1>
  <F115_Lorraine_50t>			<row> 2</row><column> 9</column></F115_Lorraine_50t>
