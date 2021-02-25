@@ -1,0 +1,213 @@
+xml_compare_missing for game version 1.11.1.3
+
+-T----class----gold--hidd-name------------- new czech [0]
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed 
+
+-T----class----gold--hidd-name------------- new france [19]
+ 6 mediumTank  True False F113_Bretagne_Panther
+ 1 mediumTank False  True F43_AMC_35_SH
+ 8  heavyTank  True False F74_AMX_M4_1949_Liberte
+ 7  lightTank  True False F69_AMX13_57_100_GrandFinal
+ 8  lightTank  True False F97_ELC_EVEN_90_FL
+ 8  heavyTank  True False F65_FCM_50t
+ 6 mediumTank  True False F85_M4A1_FL10
+ 2  lightTank  True False F111_AM39_Gendron_Somua
+ 8  lightTank  True False F106_Panhard_EBR_75_Mle1954
+ 8  heavyTank  True False F74_AMX_M4_1949_FL
+ 8 mediumTank  True False F73_M4A1_Revalorise_FL
+ 9 mediumTank  True False F114_Projet_4_1
+ 2  lightTank  True False F42_AMR_35
+ 5     AT-SPG  True False F112_M10_RBFM
+ 8 mediumTank  True False F19_Lorraine40t
+ 9  heavyTank  True  True F115_Lorraine_50t
+10     AT-SPG  True False F64_AMX_50Fosh_155
+ 8 mediumTank  True False F116_Bat_Chatillon_Bourrasque
+ 8  heavyTank  True False F84_Somua_SM
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed 
+
+-T----class----gold--hidd-name------------- new germany [48]
+ 8 mediumTank  True False G119_Panzer58_FL
+ 8  heavyTank  True False G138_VK168_02_Mauerbrecher
+ 8  heavyTank  True False G143_E75_TS
+ 5     AT-SPG  True False G104_Stug_IV
+ 8  lightTank  True  True G85_Aufklarungspanzer_V
+ 2  lightTank  True False G139_MKA
+ 7     AT-SPG  True False G48_E-25
+ 8  lightTank  True False G120_M41_90_GrandFinal
+ 5 mediumTank False  True G79_Pz_IV_AusfGH
+10     AT-SPG  True  True G98_Waffentrager_E100_P
+ 1 mediumTank False  True G24_VK3002DB_SH
+ 1  lightTank False  True G00_Bomber_SH
+ 5 mediumTank  True False G32_PzV_PzIV
+ 8 mediumTank  True False G119_Panzer58_BF
+ 8     AT-SPG  True  True G44_JagdTigerH
+ 8 mediumTank  True False G142_M48RPz
+ 4     AT-SPG  True False G151_Pz_Sfl_IC
+ 9 mediumTank  True  True G147_Kunze_Panzer
+ 8 mediumTank  True  True G154_Kpz_07_RH
+ 8     AT-SPG  True False G112_KanonenJagdPanzer
+ 8  lightTank  True False G120_M41_90
+ 8  heavyTank  True  True G115_Typ_205_4_Jun
+ 6  heavyTank  True  True G137_PzVI_Tiger_217
+ 8  heavyTank  True False G141_VK7501K
+ 8 mediumTank  True False G119_Pz58_Mutz
+ 8 mediumTank  True False G119_Panzer58
+10     AT-SPG False  True G98_Waffentrager_E100
+ 6 mediumTank False False G87_VK3002DB_V1
+ 7  heavyTank  True  True G16_PzVIB_Tiger_II_F
+ 3  lightTank  True False G36_PzII_J
+ 1        SPG False  True Env_Artillery
+ 9 mediumTank  True False G144_Kpz_50t
+ 3  lightTank  True False G117_Toldi_III
+60177          8 mediumTank False G106_PzKpfwPanther_AusfF
+ 5 mediumTank  True False G70_PzIV_Hydro
+ 8     AT-SPG  True False G114_Skorpian
+ 8  heavyTank  True False G51_Lowe_FL
+ 5 mediumTank False False G28_PzIII_IV
+ 6 mediumTank  True  True G32_PzV_PzIV_ausf_Alfa_CN
+ 6 mediumTank  True  True G32_PzV_PzIV_CN
+55313          8 AT-SPG False G65_JagdTiger_SdKfz_185
+ 7  lightTank  True  True G85_Auf_Panther
+ 7  heavyTank False  True G04_PzVI_Tiger_IA
+ 5 mediumTank  True False G32_PzV_PzIV_ausf_Alfa
+ 2  lightTank  True False G33_H39_captured
+ 7  heavyTank  True  True G58_VK4502P7
+10  heavyTank  True False G92_VK7201
+ 8     AT-SPG  True False G114_Rheinmetall_Skorpian
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed 
+
+-T----class----gold--hidd-name------------- new china [0]
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed 
+
+-T----class----gold--hidd-name------------- new italy [0]
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed 
+
+-T----class----gold--hidd-name------------- new japan [0]
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed 
+
+-T----class----gold--hidd-name------------- new poland [0]
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed 
+
+-T----class----gold--hidd-name------------- new sweden [0]
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed 
+
+-T----class----gold--hidd-name------------- new uk [18]
+ 6  lightTank  True False GB108_A46
+ 8     AT-SPG  True False GB109_GSOR_1008
+10 mediumTank False  True GB70_FV4202_105
+ 1 mediumTank False  True GB107_Cavalier_SH
+ 8  heavyTank  True  True GB111_Charlemagne
+10     AT-SPG  True False GB48_FV215b_183
+ 9 mediumTank  True  True GB106_Cobra
+ 6     AT-SPG  True False GB96_Excalibur
+ 8 mediumTank  True False GB70_N_FV4202_105_FL
+10  heavyTank  True  True GB84_Chieftain_Mk6
+ 6 mediumTank  True False GB85_Cromwell_Berlin
+10  heavyTank  True False GB98_T95_FV4201_Chieftain
+ 8 mediumTank  True False GB97_Chimera
+10  heavyTank  True  True GB88_T95_Chieftain_turret
+10  heavyTank  True False GB13_FV215b
+ 6  heavyTank  True False GB105_Black_Prince_2019
+ 5 mediumTank  True False GB37_Valliant
+ 8  lightTank  True False GB101_FV1066_Senlac
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed 
+
+-T----class----gold--hidd-name------------- new usa [31]
+ 8 mediumTank  True False A80_T26_E4_SuperPershing_FL
+ 2     AT-SPG False  True A26_T18
+ 6  lightTank  True False A134_M24E2_SuperChaffee
+ 8  heavyTank  True False A13_T34_hvy_BF
+ 8 mediumTank False  True A08_T23
+ 8 mediumTank  True False A63_M46_Patton_KR
+ 1 mediumTank False  True A72_T25_2_SH
+ 9  heavyTank  True False A125_AEP_1
+ 8 mediumTank  True False A81_T95_E2
+10 mediumTank  True False A92_M60
+ 9  heavyTank  True False A128_concept_1b
+ 8  heavyTank  True False A124_T54E2
+ 5 mediumTank  True False A78_M4_Improved
+ 6 mediumTank  True False A118_M4_Thunderbolt
+ 6     AT-SPG  True False A123_T78
+ 8  heavyTank  True False A115_Chrysler_K
+ 2        SPG False  True A15_T57
+ 8  heavyTank  True False A13_T34_hvy
+ 8  heavyTank  True False A117_T26E5_FL
+ 2  lightTank  True False A74_T1_E6
+ 8  heavyTank  True False A132_T77
+ 7     AT-SPG  True False A130_Super_Hellcat
+ 8  heavyTank  True False A12_T32_FL
+ 8 mediumTank  True False A136_T42
+ 7  heavyTank  True False A126_PzVI_Tiger_II_capt
+ 8 mediumTank  True False A111_T25_Pilot
+ 8     AT-SPG  True False A122_TS-5
+ 8  heavyTank  True False A115_Chrysler_K_GF
+ 8  heavyTank  True False A13_T34_hvy_FL
+ 8  heavyTank  True False A117_T26E5_Patriot
+ 8 mediumTank  True False A127_TL_1_LPC
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed 
+
+-T----class----gold--hidd-name------------- new ussr [63]
+10  heavyTank  True False R110_Object_260
+ 7 mediumTank  True  True R99_T44_122
+ 9  heavyTank  True False R119_Object_777
+ 5 mediumTank  True False R154_T_34E_1943
+10  heavyTank  True  True R119_Object_777C
+ 8 mediumTank  True False R122_T44_100B
+ 5  heavyTank  True False R38_KV-220
+ 1 mediumTank False  True R46_KV-13_SH
+ 9  heavyTank  True  True R172_Object_752
+ 5  heavyTank False  True R05_KV
+ 6  lightTank  True False R160_T_50_2
+10  heavyTank  True False R178_Object_780
+ 3 mediumTank  True False R143_T_29
+ 8 mediumTank  True False R122_T44_100
+10 mediumTank  True False R95_Object_907
+ 6  heavyTank  True False R152_KV2_W
+10 mediumTank  True False R120_T22SR_A22
+ 8  lightTank  True False R158_LT_432
+ 4 mediumTank  True False R68_A-32
+ 3  lightTank  True False R34_BT-SV
+ 8  heavyTank  True False R115_IS-3_auto
+10     AT-SPG  True  True R126_Object_730_5
+ 8  heavyTank  True False R61_Object252_BF
+ 5  heavyTank  True False R38_KV-220_beta
+ 3  lightTank  True False R161_T_116
+ 8  heavyTank  True  True R165_Object_703_II_2
+ 3  lightTank  True False R67_M3_LL
+10     AT-SPG False  True R93_Object263B
+ 8 mediumTank  True  True R173_K_91_2
+10 mediumTank  True  True R95_Object_907A
+ 8 mediumTank  True False R146_STG_Tday
+ 8 mediumTank  True False R112_T54_45_FL
+ 8  heavyTank  True  True R123_Kirovets_1
+ 8  heavyTank  True False R134_Object_252U
+ 6 mediumTank  True False R140_M4_Loza
+10  heavyTank  True False R157_Object_279R
+ 8     AT-SPG  True False R135_T_103
+ 8  lightTank  True  True R98_T44_85M
+ 8  heavyTank  True False R61_Object252_FL
+ 7     AT-SPG  True False R116_ISU122C_Berlin
+ 8 mediumTank  True False R180_Object_274_A
+ 9     AT-SPG  True  True R183_K_91_PT
+ 6 mediumTank  True False R117_T34_85_Rudy
+ 9     AT-SPG False  True R75_SU122_54
+ 8 mediumTank  True False R127_T44_100_U
+ 7  heavyTank  True False R175_IS_2_screen
+ 8  heavyTank  True False R134_Object_252K
+ 2  lightTank  True False R125_T_45
+ 5  lightTank False  True R70_T_50_2
+ 8 mediumTank  True False R20_T-44_FL
+ 8 mediumTank  True False R127_T44_100_K
+ 1  lightTank False  True Observer
+ 8  heavyTank  True False R113_Object_730
+10 mediumTank False  True R96_Object_430B
+ 7  heavyTank  True False R71_IS_2B
+ 7  heavyTank  True False R156_IS_2M
+ 8  heavyTank  True False R128_KV4_Kreslavskiy
+ 8     AT-SPG  True False R159_SU_130PM
+ 8  heavyTank False  True R115_IS-3_auto_test
+ 8 mediumTank  True False R127_T44_100_P
+ 8     AT-SPG  True False R177_ISU_152K_BL10
+ 8  heavyTank  True False R54_KV-5
+ 8  heavyTank  True False R165_Object_703_II
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed 
