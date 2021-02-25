@@ -111,7 +111,6 @@ class aTechTree():
             if node.isAnnouncement:
                 self._addNode(nodeCD, self._makeAnnouncementNode(node, displayInfo))
             item = getItem(nodeCD)
-            print item
             ##if item.isHidden:
             ##    continue
             index = self._addNode(nodeCD, self._makeRealExposedNode(node, item, unlockStats, displayInfo))
