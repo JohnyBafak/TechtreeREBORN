@@ -1,4 +1,4 @@
-﻿__version__ = "0.2.1"
+﻿__version__ = "0.2.2"
 """ 
  Advanced TechTree by Johny_Bafak
  http://forum.worldoftanks.eu/index.php?/topic/514277-
@@ -15,7 +15,7 @@
 """
 # Common
 import inspect, functools, copy
-import ResMgr
+import ResMgr, BigWorld
 from debug_utils import LOG_ERROR, LOG_WARNING, LOG_CURRENT_EXCEPTION
 # Mod settings API
 try:
@@ -164,6 +164,8 @@ from gui.Scaleform.locale.SETTINGS import SETTINGS
 from gui.Scaleform.locale.VEH_COMPARE import VEH_COMPARE
 import os, BigWorld
 from gui.Scaleform.framework import ScopeTemplates, ViewSettings, g_entitiesFactories
+from gui.Scaleform.framework.managers.loaders import SFViewLoadParams
+from gui.shared.personality import ServicesLocator
 
 _preferences_path = os.path.join('mods', 'configs', 'techtree')
 if not os.path.exists(_preferences_path): os.makedirs(_preferences_path)
@@ -190,7 +192,10 @@ class aUIcontrol():
         if os.path.exists(USER_SETTINGS_PATH):
             try:
                 with open(USER_SETTINGS_PATH) as f:
-                    self.CFG = json.load(f, object_hook=ascii_encode_dict)
+                with open(dir + 'AdvancedTechTree.json') as df:
+                    for line in f: 
+                        file += line.split("//")[0]                 
+                    self.CFG = json.loads(file)
             except:
                 LOG_WARNING("[aTechTree] Can't load config file, using default settings.")
         
@@ -287,7 +292,7 @@ class aUIcontrol():
         return templates
         
     def genModApiStaticVO(self):
-        return {'windowTitle': 'Mod configurator',
+        return {'windowTitle': 'aTechTree mod settings',
         'stateTooltip': '{HEADER}Enable / Disable mod {/HEADER}{BODY} Red indicator - mod disabled <br> Green indicator - mod enabled{/BODY}',
         'buttonOK': SETTINGS.OK_BUTTON,
         'buttonCancel': SETTINGS.CANCEL_BUTTON,
@@ -376,18 +381,13 @@ aTTcfg = aUIcontrol()
     HAS_TECH_TREE_EVENT = 536870912
     TECH_TREE_EVENT_DISCOUNT_ONLY = 1073741824"""
     
-import BigWorld
-import game
-import Keys
-
 
 modLinkage = 'att'
-
-
+UIv = 3
 template  = {
-	'modDisplayName': 'Advanced TechTree {ver}'.format(ver=__version__),
+	'modDisplayName': 'Advanced TechTree {ver}#{ui}'.format(ver=__version__, ui=UIv),
 	'enabled': True,
-    'UIv': 2,
+    'UIv': UIv,
 	'column1': [
         { 'type': "Empty" },
 		{ 'type': 'CheckBox',   'varName': 'dataUpdate',    'value': False,  'text': 'Allow techtree data update',
@@ -395,15 +395,18 @@ template  = {
 		{ 'type': 'CheckBox',   'varName': 'sysMessage',    'value': True,   'text': 'Allow system messages',
           'tooltip': '{HEADER}Сообщить в командный чат «Нужна помощь!»{/HEADER}{BODY}При вашем обнаружении мод автоматические отправит команду «Нужна помощь!» вашим союзникам{/BODY}' },   
         { 'type': "Empty" },
-		{ 'type': 'CheckBox',   'varName': 'showHidden',    'value': True,  'text': 'Show hidden tanks in techtree',
+		{ 'type': 'CheckBox',   'varName': 'showHidden',    'value': True,  'text': 'Show hidden vehicles in techtree',
 		  'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}' },
+        { 'type': 'CheckBox',   'varName': 'showCollec',    'value': True,  'text': "Show collector's tanks in techtree",
+		  'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}' },
+        { 'type': 'CheckBox',   'varName': 'showEvent',     'value': False,  'text': "Show event tanks in techtree",
+		  'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}' }
 	],
-		
 	'column2': [
         { 'type': "Empty" },
         { 'type': 'Dropdown', 'varName': 'layout',          'value': 1,     'text': 'TechtTree layout',       
           'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}',
-		  'options':  [
+		  'width': 350, 'options':  [
 				{ 'label': 'Wold of Tanks' },
 				{ 'label': 'jbDefault' }
 			]
@@ -412,14 +415,14 @@ template  = {
 		{ 'type': 'CheckBox',   'varName': 'autoGap',       'value': True,  'text': 'Automaticaly caltulate gaps',
 		  'tooltip': '{HEADER}Всегда оповещать о засвете при игре на артиллерии{/HEADER}{BODY}Если вы вишли в бой на артилерии, мод будет всегда оповещать о вашем засвете независимо от выставленного лимита на число оставшехся в живих союзниках{/BODY}' },
         { 'type': 'RangeSlider','varName': 'gapRange', 'value': [10, 50],   'text': 'Gap size range',
-			'divisionLabelPostfix': '',	'divisionLabelStep': 50, 'divisionStep': 50, 
+			"""'divisionLabelPostfix': '',	'divisionLabelStep': 50, 'divisionStep': 50, """
 			'maximum': 100, 'minimum': 0,	'minRangeDistance': 0,	'snapInterval': 1
 		},  
-		{ 'type': 'NumericStepper', 'text': 'NumericStepper test',
+		{ 'type': 'NumericStepper', 'text': 'Gap size range',
 			'tooltip': '{HEADER}NumericStepper tooltip header{/HEADER}{BODY}NumericStepper tooltip body{/BODY}',
 			'minimum': 1, 'maximum': 15, 'snapInterval': 1,	'value': 5,	'varName': 'numStepperTest'
 		},
-        { "varName": "btn_reload",          'type': "RadioButtonGroup", 'text': 'btn_text', "options": [ ], "button": { "width": 200,   "height": 22,   'text': 'btn_label' } }
+        { "varName": "Reload TechTree",          'type': "RadioButtonGroup", 'text': 'Reload Layout', "options": [ ], "button": { "width": 350,   "height": 22,   'text': 'btn_label' } }
 	]
 }
 
@@ -435,8 +438,6 @@ def onButtonClicked(linkage, varName, value):
     else:
         print 'onButtonClicked', linkage, "not meeeeeeeeeeeeeeeee"
 
-from gui.Scaleform.framework.managers.loaders import SFViewLoadParams
-from gui.shared.personality import ServicesLocator
 
 savedSettings = aTTcfg.getModSettings(modLinkage)
 if savedSettings:
