@@ -1,4 +1,4 @@
-﻿__version__ = "0.2.0"
+﻿__version__ = "0.2.1"
 """ 
  Advanced TechTree by Johny_Bafak
  http://forum.worldoftanks.eu/index.php?/topic/514277-
@@ -16,7 +16,7 @@
 # Common
 import inspect, functools, copy
 import ResMgr
-from debug_utils import LOG_ERROR, LOG_CURRENT_EXCEPTION
+from debug_utils import LOG_ERROR, LOG_WARNING, LOG_CURRENT_EXCEPTION
 # Mod settings API
 try:
     from gui.modsListApi import g_modsListApi
@@ -48,7 +48,6 @@ def ascii_encode_dict(data):
 
 def loadView(api):
     ServicesLocator.appLoader.getDefLobbyApp().loadView(SFViewLoadParams(VIEW_ALIAS, VIEW_ALIAS), ctx=api)
-
 
 def override(obj, prop, getter=None, setter=None, deleter=None):
     if inspect.isclass(obj) and prop.startswith('__') and prop not in dir(obj) + dir(type(obj)):
@@ -176,14 +175,16 @@ TEMPLATE_PATH = os.path.join(_preferences_path, 'jb_atechtree.dat')
 
 class aUIcontrol():
     def __init__(self):
-        self.mods = set()
+        self.modList = set()
         self.TPL = {}
         self.CFG = {}
         self.onSettingsChanged = Event.Event()
         self.onButtonClicked = Event.Event()
         self.configLoad()
         
-        g_modsListApi.addModification('jbATT', "TechTree", 'This mod allows you to easily configure installed techtree mods.', 'gui/maps/icons/modsSettingsApi/atechtree.png', True, True, True, functools.partial(loadView, self))
+        _info = 'This mod allows you to easily configure installed techtree mods.'
+        _png = 'gui/maps/icons/modsSettingsApi/atechtree.png'
+        g_modsListApi.addModification('jbATT', "TechTree", _info, _png, True, True, True, functools.partial(loadView, self))
         
     def configLoad(self):
         if os.path.exists(USER_SETTINGS_PATH):
@@ -191,7 +192,7 @@ class aUIcontrol():
                 with open(USER_SETTINGS_PATH) as f:
                     self.CFG = json.load(f, object_hook=ascii_encode_dict)
             except:
-                LOG_CURRENT_EXCEPTION()
+                LOG_WARNING("[aTechTree] Can't load config file, using default settings.")
         
         if os.path.exists(TEMPLATE_PATH):
             try:
@@ -200,9 +201,9 @@ class aUIcontrol():
             except:
                 LOG_CURRENT_EXCEPTION()
         else:
-            self.templateSave()
+            self.TMPsave()
             
-    def templateSave(self):
+    def TMPsave(self):
         try:
             with open(TEMPLATE_PATH, 'w') as f:
                 json.dump(self.TPL, f, ensure_ascii=False, encoding='utf-8')
@@ -218,7 +219,7 @@ class aUIcontrol():
             LOG_CURRENT_EXCEPTION()        
 
     def compareTemplates(self, newTemplate, oldTemplate):
-        return newTemplate['UIv'] > oldTemplate['UIv'] if 'UIv' in newTemplate and 'UIv' in oldTemplate else True
+        return newTemplate['UIver'] > oldTemplate['UIver'] if 'UIver' in newTemplate and 'UIver' in oldTemplate else True
         
     def getSettingsFromTemplate(self, template):
         result = dict()
@@ -246,14 +247,14 @@ class aUIcontrol():
             if not currentTemplate or self.compareTemplates(template, currentTemplate):
                 self.TPL[mod] = template
                 self.CFG[mod] = self.getSettingsFromTemplate(template)
-                self.templateSave()
+                self.TMPsave()
             return self.getModSettings(mod)
         except:
             LOG_CURRENT_EXCEPTION()
         return
         
     def registerCallback(self, mod, callback, buttonHandler=None):
-        self.mods.add(mod)
+        self.modList.add(mod)
         self.onSettingsChanged += callback
         if buttonHandler is not None:
             self.onButtonClicked += buttonHandler
@@ -267,9 +268,8 @@ class aUIcontrol():
         self.onSettingsChanged(mod, newSettings)
         
     def cleanConfig(self):
-        print 'cleaningConfig .............................................................'
         for mod in self.TPL.keys():
-            if mod not in self.mods:
+            if mod not in self.modList:
                 del self.TPL[mod]
                 del self.CFG[mod]
                 
@@ -281,8 +281,9 @@ class aUIcontrol():
             for column in COLUMNS:
                 if column in template:
                     for component in template[column]:
-                        if 'varName' in component and 'varName' in settings:
-                                component['value'] = settings[component['varName']]
+                        varName = component.get('varName')
+                        if varName and settings.get(varName):
+                                component['value'] = settings[varName]
         return templates
         
     def genModApiStaticVO(self):
@@ -384,117 +385,42 @@ modLinkage = 'att'
 
 
 template  = {
-	'modDisplayName': 'Мод «Я обнаружен»',
+	'modDisplayName': 'Advanced TechTree {ver}'.format(ver=__version__),
 	'enabled': True,
-    'UIv': 1,
+    'UIv': 2,
 	'column1': [
-		{
-			'type': 'CheckBox',
-			'text': 'Показать на миникарте квадрат засвета',
-			'value': True,
-			'tooltip': '{HEADER}Показать на миникарте квадрат засвета{/HEADER}{BODY}При вашем обнаружении мод автоматические кликнет на миникарте в квадрат где вы находитесь{/BODY}',
-			'varName': 'minimapClick'
-		},
-		{
-			'type': 'CheckBox',
-			'text': 'Сообщить в командный чат «Нужна помощь!»',
-			'value': True,
-			'tooltip': '{HEADER}Сообщить в командный чат «Нужна помощь!»{/HEADER}{BODY}При вашем обнаружении мод автоматические отправит команду «Нужна помощь!» вашим союзникам{/BODY}',
-			'varName': 'neadHelp'
-		},
-		{
-			'type': 'Dropdown',
-			'text': 'Озвучка «Шестого чувства»',
-			'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}',
-			'options':  [
-				{ 'label': 'Стандартная' },
-				{ 'label': 'Тихая' },
-				{ 'label': 'Громкая' }
-			],
-			'button': {
-				'width': 30,
-				'height': 23,
-				'offsetTop': 0,
-				'offsetLeft': 0,
-				'iconSource': '../maps/icons/buttons/sound.png',
-				'iconOffsetTop': 0,
-				'iconOffsetLeft': 1,
-			},
-			'width': 200,
-			'value': 0,
-			'varName': 'sixthSenseSound'
-		}
+        { 'type': "Empty" },
+		{ 'type': 'CheckBox',   'varName': 'dataUpdate',    'value': False,  'text': 'Allow techtree data update',
+          'tooltip': '{HEADER}Показать на миникарте квадрат засвета{/HEADER}{BODY}При вашем обнаружении мод автоматические кликнет на миникарте в квадрат где вы находитесь{/BODY}' },
+		{ 'type': 'CheckBox',   'varName': 'sysMessage',    'value': True,   'text': 'Allow system messages',
+          'tooltip': '{HEADER}Сообщить в командный чат «Нужна помощь!»{/HEADER}{BODY}При вашем обнаружении мод автоматические отправит команду «Нужна помощь!» вашим союзникам{/BODY}' },   
+        { 'type': "Empty" },
+		{ 'type': 'CheckBox',   'varName': 'showHidden',    'value': True,  'text': 'Show hidden tanks in techtree',
+		  'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}' },
 	],
 		
 	'column2': [
-		{
-			'type': 'Slider',
-			'text': 'Число живых союзников для активации мода',
-			'minimum': 1,
-			'maximum': 15,
-			'snapInterval': 1,
-			'value': 5,
-			'format': '{{value}}',
-			'varName': 'aliveCounter'
+        { 'type': "Empty" },
+        { 'type': 'Dropdown', 'varName': 'layout',          'value': 1,     'text': 'TechtTree layout',       
+          'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}',
+		  'options':  [
+				{ 'label': 'Wold of Tanks' },
+				{ 'label': 'jbDefault' }
+			]
 		},
-		{
-			'type': 'CheckBox',
-			'text': 'Всегда оповещать о засвете при игре на артиллерии',
-			'tooltip': '{HEADER}Всегда оповещать о засвете при игре на артиллерии{/HEADER}{BODY}Если вы вишли в бой на артилерии, мод будет всегда оповещать о вашем засвете независимо от выставленного лимита на число оставшехся в живих союзниках{/BODY}',
-			'value': True,
-			'varName': 'alwaysOnArty'
-		},
-		{
-			'type': 'HotKey',
-			'text': 'Включение/отключение по кнопке',
-			'tooltip': '{HEADER}Включение/отключение по кнопке{/HEADER}{BODY}Активирует либо деактивирует модификацию при нажатии кнопки/комбинации кнопок{/BODY}',
-			'value': [Keys.KEY_J],
-			'varName': 'stateKeySet'          
-		},
-		{
-			'type': 'NumericStepper',
-			'text': 'NumericStepper test',
+        { 'type': "Empty" },
+		{ 'type': 'CheckBox',   'varName': 'autoGap',       'value': True,  'text': 'Automaticaly caltulate gaps',
+		  'tooltip': '{HEADER}Всегда оповещать о засвете при игре на артиллерии{/HEADER}{BODY}Если вы вишли в бой на артилерии, мод будет всегда оповещать о вашем засвете независимо от выставленного лимита на число оставшехся в живих союзниках{/BODY}' },
+        { 'type': 'RangeSlider','varName': 'gapRange', 'value': [10, 50],   'text': 'Gap size range',
+			'divisionLabelPostfix': '',	'divisionLabelStep': 50, 'divisionStep': 50, 
+			'maximum': 100, 'minimum': 0,	'minRangeDistance': 0,	'snapInterval': 1
+		},  
+		{ 'type': 'NumericStepper', 'text': 'NumericStepper test',
 			'tooltip': '{HEADER}NumericStepper tooltip header{/HEADER}{BODY}NumericStepper tooltip body{/BODY}',
-			'minimum': 1,
-			'maximum': 15,
-			'snapInterval': 0.1,
-			'value': 5,
-			'varName': 'numStepperTest'
+			'minimum': 1, 'maximum': 15, 'snapInterval': 1,	'value': 5,	'varName': 'numStepperTest'
 		},
-		{
-			'type': 'ColorChoice',
-			'text': 'ColorChoice test',
-			'tooltip': '{HEADER}ColorChoice tooltip header{/HEADER}{BODY}ColorChoice tooltip body{/BODY}',
-			'value': "FFFFFF",
-			'varName': 'colorChoice'
-		},
-		{
-			'type': 'RangeSlider',
-			'text': 'RangeSlider test',
-			'divisionLabelPostfix': '',
-			'divisionLabelStep': 50,
-			'divisionStep': 50,
-			'maximum': 100,
-			'minimum': 0,
-			'minRangeDistance': 10,
-			'snapInterval': 1,
-			'value': [20, 50],
-			'varName': 'rangeSlider'
-		},
+        { "varName": "btn_reload",          'type': "RadioButtonGroup", 'text': 'btn_text', "options": [ ], "button": { "width": 200,   "height": 22,   'text': 'btn_label' } }
 	]
-}
-
-settings = {
-	'sixthSenseSound' : 0,
-	'stateKeySet' : [Keys.KEY_F8],
-	'alwaysOnArty' : True,
-	'neadHelp' : True,
-	'enabled' : True,
-	'minimapClick' : True,
-	'aliveCounter' : 5,
-	'numStepperTest' : 5,
-	'colorChoice' : 'FFFFFF',
-	'rangeSlider' : [20, 50],
 }
 
 def onModSettingsChanged(linkage, newSettings):    
