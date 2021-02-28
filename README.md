@@ -4,12 +4,13 @@
 - unlock comparison for all vehicles
 - allow preview for all tanks available in client
 - show all tanks in techtree
+- configure mod ingame
 
 ## jb.getTanks
 - scan game for all available vehicles currently in game
 - creates report in form of CSV file in res_mods/<current_version>
 
-As of v0.1.2 the list includes following:
+As of v0.3.1 the list includes following:
 - nation code
 - techtree file name
 - ingame name
@@ -22,16 +23,16 @@ As of v0.1.2 the list includes following:
 - hidden - not yet released and/or removed tanks
 - fallout game mode vehicles
 - bob - team clash rental BB tanks
+- epic - FL battles vehicles 
+- battleRoyale - SH steel hunter vehicles
 - collectorVehicle
+- event vehicle
 - *any remaing unresolved tag
 
 # TO-DO:
- - fix resear page issue for not-previewable vehicles
- - update _build.py for releasing obfuscated mod
  - remake techtree_generator
  - add configuration
- - implement UI configuration window
  - rework vehicle techtree placement 
- - L10n
+ - L10n/i18n
 
 
