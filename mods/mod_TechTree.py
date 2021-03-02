@@ -1,4 +1,4 @@
-﻿__version__ = "0.3.0"
+﻿__version__ = "0.3.1"
 print "[LOADMOD] (aTechTree) v.{} {}".format(__version__, "21-02-28")
 """ 
  Advanced TechTree by Johny_Bafak
@@ -34,7 +34,7 @@ from gui.Scaleform.daapi.view.lobby.techtree.techtree_dp import g_techTreeDP
 from gui.Scaleform.daapi.view.lobby.techtree.techtree_page import TechTree
 from gui.Scaleform.daapi.view.lobby.techtree.data import NationTreeData, ResearchItemsData
 from gui.Scaleform.genConsts.NODE_STATE_FLAGS import NODE_STATE_FLAGS
-
+CONFIG = {}
 """         Common utils:
                 @override               override standart function
 """
@@ -104,7 +104,7 @@ class aTechTree():
     
     def __init__(self):
         """ aTechTree main function class """
-
+        
         override(NationTreeData, 'load', self.load)                                     # Add all nodes
         override(NationTreeData, '_makeRealExposedNode', self._makeRealExposedNode)     # Node display info
         override(TechTree, 'goToNextVehicle', self.goToNextVehicle)                     # Reseasch page crash
@@ -122,8 +122,17 @@ class aTechTree():
             if node.isAnnouncement:
                 self._addNode(nodeCD, self._makeAnnouncementNode(node, displayInfo))
             item = getItem(nodeCD)
-            ##if item.isHidden:
-            ##    continue
+                
+            if item.isOnlyForBob or item.isOnlyForEventBattles or item.isOnlyForEpicBattles or item.isOnlyForBattleRoyaleBattles or item.isEvent:
+                if not CONFIG.get("showEvent"):
+                    continue
+            elif item.isCollectible:
+                if not CONFIG.get("showCollec"): 
+                    continue
+            elif item.isHidden:
+                if not CONFIG.get("showHidden"):
+                    continue           
+            
             index = self._addNode(nodeCD, self._makeRealExposedNode(node, item, unlockStats, displayInfo))
             if nodeCD == selectedID:
                 self._scrollIndex = index
@@ -145,43 +154,35 @@ class aTechTree():
     def goToNextVehicle(hook, baseFunc, self, vehCD):
         """ tchtree.techtree_page.TechTree.goToNextVehicle """
         item = self._data.getItem(int(vehCD))
-        print item.isPreviewAllowed()
         if item.isPreviewAllowed():
             baseFunc(self, vehCD)
         
 
     
-UIv = 0
+UIv = 12
 template  = {
 	'modDisplayName': 'Advanced TechTree {ver}#{ui}'.format(ver=__version__, ui=UIv),
 	'enabled': True,
-    #'UIver': UIv,
+    'UIver': UIv,
 	'column1': [
         { 'type': "Empty" },
-		{ 'type': 'CheckBox',   'varName': 'dataUpdate',    'value': False,  'text': 'Allow techtree data update',
-          'tooltip': '{HEADER}Показать на миникарте квадрат засвета{/HEADER}{BODY}При вашем обнаружении мод автоматические кликнет на миникарте в квадрат где вы находитесь{/BODY}' },
-        { "varName": "update",   'value': -1,  'type': "RadioButtonGroup", 'text': 'Update data', "options": [ ], "button": { "width": 200,   "height": 22,   'text': 'xxx' } },
 		{ 'type': 'CheckBox',   'varName': 'sysMessage',    'value': True,   'text': 'Allow system messages',
-          'tooltip': '{HEADER}Сообщить в командный чат «Нужна помощь!»{/HEADER}{BODY}При вашем обнаружении мод автоматические отправит команду «Нужна помощь!» вашим союзникам{/BODY}' },   
+          'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },   
         { 'type': "Empty" },
 		{ 'type': 'CheckBox',   'varName': 'showHidden',    'value': True,  'text': 'Show hidden vehicles in techtree',
-		  'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}' },
+		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
         { 'type': 'CheckBox',   'varName': 'showCollec',    'value': True,  'text': "Show collector's tanks in techtree",
-		  'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}' },
-        { 'type': 'Dropdown', 'varName': 'layout0',          'value': 1,     'text': 'TechtTree layout',       
-          'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}',
-		  'width': 400, 'options':  [
-				{ 'label': 'Wold of Tanks' },
-				{ 'label': 'jbDefault' }
-			]
-		},
+		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
         { 'type': 'CheckBox',   'varName': 'showEvent',     'value': True,  'text': "Show event tanks in techtree",
-		  'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}' }
+		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
+        { 'type': 'CheckBox',   'varName': 'dataUpdate',    'value': False,  'text': 'Allow techtree data update',
+          'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
+        { "varName": "update",   'value': -1,  'type': "RadioButtonGroup", 'text': 'Update data', "options": [ ], "button": { "width": 200,   "height": 22,   'text': 'xxx' } }
 	],
 	'column2': [
         { 'type': "Empty" },
         { 'type': 'Dropdown', 'varName': 'layout',          'value': 1,     'text': 'TechtTree layout',       
-          'tooltip': '{HEADER}Озвучка «Шестого чувства»{/HEADER}{BODY}При срабатывании навыка «Шестого чувства» будет воспроизводиться один из нескольких вариантов озвучки.{/BODY}',
+          'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]',
 		  'width': 400, 'options':  [
 				{ 'label': 'Wold of Tanks' },
 				{ 'label': 'jbDefault' }
@@ -189,9 +190,9 @@ template  = {
 		},
         { 'type': "Empty" },
 		{ 'type': 'CheckBox',   'varName': 'autoGap',       'value': True,  'text': 'Automaticaly caltulate gaps',
-		  'tooltip': '{HEADER}Всегда оповещать о засвете при игре на артиллерии{/HEADER}{BODY}Если вы вишли в бой на артилерии, мод будет всегда оповещать о вашем засвете независимо от выставленного лимита на число оставшехся в живих союзниках{/BODY}' },
+		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
         { 'type': 'RangeSlider','varName': 'gapRange', 'value': [10, 50],   'text': 'Gap size range',
-            'divisionLabelPostfix': 'px', 'divisionLabelStep': 20, 'divisionStep': 10,
+            'divisionLabelStep': 10, 'divisionStep': 10,
 			'maximum': 60, 'minimum': 0,	'minRangeDistance': 0,	'snapInterval': 1
 		},  
 		{ 'type': 'NumericStepper', 'text': 'Gap size range',
@@ -203,11 +204,11 @@ template  = {
 }
 
 def onModSettingsChanged(newSettings):    
-    print 'onModSettingsChanged', newSettings
+    CONFIG.update(newSettings)
     
-def onButtonClicked(linkage, varName, value):    
-    print 'onButtonClicked', linkage, varName, value
+def onButtonClicked(varName, value):    
+    print 'onButtonClicked', varName, value
 
-settings = g_aTT.setModTemplate('att', template, onModSettingsChanged, onButtonClicked)  
+CONFIG = g_aTT.setModTemplate('att', template, onModSettingsChanged, onButtonClicked)  
 
 g_aTechTree = aTechTree()
