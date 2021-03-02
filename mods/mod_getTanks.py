@@ -41,10 +41,12 @@ def gtNationLoad(natID, veh, path, ignore = []):
             iNat, iNam = tname.split(":")
             item = b.getItem(v.compactDescr)
             
-            """# helper vehicle:
-            if v.compactDescr == 3585: #su-100
-                pass"""
-            
+            # helper vehicle:
+            """if v.compactDescr == 3585: #su-100
+                print dir( item.buyPrices ) 
+                print item.buyPrices.itemPrice
+                print type(item.buyPrices.itemPrice)"""
+                
             vehicleTags = list(v.tags)
             tag, vehicleTags = tagClear(vehicleTags, clear,[])         
                        
@@ -87,7 +89,7 @@ def readIgnore():
 def updateTemplate():
     global g_aTT
     g_aTT.TPL["gtl"]["column1"][1]["options"] = [ { 'label': n } for n in readIgnore() ]
-    
+    g_aTT.TPL["gtl"]["column2"][3]["text"] = "Last generated for: {}".format(PATH.rpartition('/')[2]) if os.path.isfile(PATH + "_tankList.csv") else "Not generated yet"    
 
 def startList():
     vehList = vehicles_core.VehicleList()
@@ -144,7 +146,6 @@ if g_aTT:
     CONFIG = g_aTT.setModTemplate('gtl', CONFIG, onGTSettings, onGTButton)  
     
     updateTemplate()
-    g_aTT.TPL["gtl"]["column2"][3]["text"] = "Last generated for: {}".format(PATH.rpartition('/')[2]) if os.path.isfile(PATH + "_tankList.csv") else "Not generated yet"
     
 if CONFIG.get('vehList'):
     startList()
