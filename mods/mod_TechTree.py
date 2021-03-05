@@ -123,7 +123,7 @@ class aTechTree():
                 self._addNode(nodeCD, self._makeAnnouncementNode(node, displayInfo))
             item = getItem(nodeCD)
                 
-            if item.isOnlyForBob or item.isOnlyForEventBattles or item.isOnlyForEpicBattles or item.isOnlyForBattleRoyaleBattles or item.isEvent:
+            if item.isOnlyForEventBattles or item.isOnlyForEpicBattles or item.isOnlyForBattleRoyaleBattles or item.isEvent:
                 if not CONFIG.get("showEvent"):
                     continue
             elif item.isCollectible:

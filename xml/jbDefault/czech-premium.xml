@@ -6,6 +6,7 @@
 </grid>
 <nodes>
  <Cz01_Skoda_T40>				<row> 1</row><column> 6</column></Cz01_Skoda_T40>
+ <Cz15_Skoda_T-45_Prem>			<row> 1</row><column> 7</column></Cz15_Skoda_T-45_Prem>
  <Cz13_T_27>					<row> 1</row><column> 8</column></Cz13_T_27>
 </nodes>
 </czech-premium.xml>

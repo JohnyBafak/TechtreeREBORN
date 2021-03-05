@@ -32,7 +32,7 @@ def getVersion(game):
         
 def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = True):
     ver = getVersion(WOT)
-    fname = '{}/res_mods/{}_tankList.csv'.format( WOT, ver )
+    fname = '{}/mods/{}_tankList.csv'.format( WOT, ver )
     global GAME
     if os.path.isfile( fname ):
         with open(fname) as f:
