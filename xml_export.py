@@ -20,6 +20,8 @@ def main(SOURCE = './xml/jbDefault', WOT = "D:/World_of_Tanks_EU"):
     # Copy finish
     destPath = WOT +'/res_mods/' + getVersion(WOT) + '/gui/flash/techtree/' 
     print destPath
+    if not os.path.exists(destPath):
+        os.makedirs(destPath)
     for file in  os.listdir(SOURCE):
         if file.endswith(".xml"):
             shutil.copy2(os.path.join(SOURCE,file),destPath)
