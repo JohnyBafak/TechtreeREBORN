@@ -32,8 +32,9 @@ def main(SOURCE = './xml/jbDefault', WOT = "D:/World_of_Tanks_EU"):
     
     cmd = raw_input("> RELEASE XML files?")
     if len(cmd):
-        copyXML(SOURCE, '../techtreeRelease/{}'.format(SOURCE[2:]) )
-    
+        destPath = '../techtreeRelease/{}'.format(SOURCE[2:])
+        copyXML(SOURCE, destPath)
+        shutil.copy2("tree-shared.xml",destPath)
     print "         Done, Tree-Shared-XML:", True if(len(cmd)) else False
     
 if __name__ == "__main__":

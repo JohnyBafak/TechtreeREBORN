@@ -1,5 +1,5 @@
-﻿__version__ = "0.3.1"
-print "[LOADMOD] (aTechTree) v.{} {}".format(__version__, "21-02-28")
+﻿__version__ = "0.4.2"
+print "[LOADMOD] (aTechTree) v.{} {}".format(__version__, "21-03-13")
 """ 
  Advanced TechTree by Johny_Bafak
  http://forum.worldoftanks.eu/index.php?/topic/514277-
@@ -17,6 +17,7 @@ print "[LOADMOD] (aTechTree) v.{} {}".format(__version__, "21-02-28")
 # Common
 import inspect, functools
 import ResMgr, BigWorld
+from gui import SystemMessages
 
 # Mod settings API
 from gui.mods.atechtree import g_aTT
@@ -108,6 +109,12 @@ class aTechTree():
         override(NationTreeData, 'load', self.load)                                     # Add all nodes
         override(NationTreeData, '_makeRealExposedNode', self._makeRealExposedNode)     # Node display info
         override(TechTree, 'goToNextVehicle', self.goToNextVehicle)                     # Reseasch page crash
+        # error handle
+        import gui.Scaleform.daapi.view.lobby.techtree.techtree_dp as TT_dp
+        override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNodeLines', self._readNodeLines)
+        override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__getLineInfo', self._getLineInfo)
+        override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNodeList', self._readNodeList)
+        override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNation', self._readNation)
     
     def load(hook, baseFunc, self, nationID, override = None):
         """ techtree.data.NationTreeData.load """
@@ -152,23 +159,58 @@ class aTechTree():
         return data
         
     def goToNextVehicle(hook, baseFunc, self, vehCD):
-        """ tchtree.techtree_page.TechTree.goToNextVehicle """
+        """ techtree.techtree_page.TechTree.goToNextVehicle """
         item = self._data.getItem(int(vehCD))
         if item.isPreviewAllowed():
             baseFunc(self, vehCD)
         
-
+    def _getLineInfo(hook, baseFunc, self, xmlCtx, lineName, nodeCD, outPin, inPin, lineShared):
+        if CONFIG.get('sysMessage'):
+            try:
+                res = baseFunc(self, xmlCtx, lineName, nodeCD, outPin, inPin, lineShared)
+            except Exception as msg:
+                SystemMessages.pushMessage(msg, type=SystemMessages.SM_TYPE.Error)
+            return res
+            
+        else: 
+            return baseFunc(self, xmlCtx, lineName, nodeCD, outPin, inPin, lineShared)
+            
+    def _readNodeLines(hook, baseFunc, self, parentCD, nation, xmlCtx, section, shared):
+        if CONFIG.get('sysMessage'):
+            try:
+                lines = baseFunc(self, parentCD, nation, xmlCtx, section, shared)
+            except Exception as msg:
+                SystemMessages.pushMessage(msg, type=SystemMessages.SM_TYPE.Error)
+            return lines
+            
+        else: 
+            return baseFunc(self, parentCD, nation, xmlCtx, section, shared)
+            
+    def _readNodeList(hook, baseFunc, self, shared, nation, xmlPath, clearCache=False):
+        if CONFIG.get('sysMessage'):
+            try:
+                displayInfo, displaySettings, gridSettings = baseFunc(self, shared, nation, xmlPath, clearCache)
+            except Exception as msg:
+                SystemMessages.pushMessage(msg, type=SystemMessages.SM_TYPE.Error)
+            return (displayInfo, displaySettings, gridSettings)
+            
+        else: 
+            return baseFunc(self, shared, nation, xmlPath, clearCache)
     
-UIv = 12
+    def _readNation(hook, baseFunc, self, shared, nation, clearCache=False):
+        try:
+            return baseFunc(self, shared, nation, clearCache=False)
+        except: 
+            return {}
+    
+UIv = 16
 template  = {
 	'modDisplayName': 'Advanced TechTree {ver}#{ui}'.format(ver=__version__, ui=UIv),
 	'enabled': True,
     'UIver': UIv,
 	'column1': [
         { 'type': "Empty" },
-		{ 'type': 'CheckBox',   'varName': 'sysMessage',    'value': True,   'text': 'Allow system messages',
-          'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },   
-        { 'type': "Empty" },
+		
 		{ 'type': 'CheckBox',   'varName': 'showHidden',    'value': True,  'text': 'Show hidden vehicles in techtree',
 		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
         { 'type': 'CheckBox',   'varName': 'showCollec',    'value': True,  'text': "Show collector's tanks in techtree",
@@ -181,25 +223,20 @@ template  = {
 	],
 	'column2': [
         { 'type': "Empty" },
-        { 'type': 'Dropdown', 'varName': 'layout',          'value': 1,     'text': 'TechtTree layout',       
+        { 'type': 'Dropdown', 'varName': 'layout',          'value': 0,     'text': 'TechtTree layout',       
           'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]',
 		  'width': 400, 'options':  [
-				{ 'label': 'Wold of Tanks' },
-				{ 'label': 'jbDefault' }
+				{ 'label': 'jbDefault' },
+				{ 'label': 'KukieJar' }
 			]
 		},
         { 'type': "Empty" },
-		{ 'type': 'CheckBox',   'varName': 'autoGap',       'value': True,  'text': 'Automaticaly caltulate gaps',
-		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
-        { 'type': 'RangeSlider','varName': 'gapRange', 'value': [10, 50],   'text': 'Gap size range',
-            'divisionLabelStep': 10, 'divisionStep': 10,
-			'maximum': 60, 'minimum': 0,	'minRangeDistance': 0,	'snapInterval': 1
-		},  
-		{ 'type': 'NumericStepper', 'text': 'Gap size range',
-			'tooltip': '{HEADER}NumericStepper tooltip header{/HEADER}{BODY}NumericStepper tooltip body{/BODY}',
-			'minimum': 1, 'maximum': 15, 'snapInterval': 1,	'value': 5,	'varName': 'numStepperTest'
-		},
-        { "varName": "reload",   'value': -1,  'type': "RadioButtonGroup", 'text': 'Reload Layout', "options": [ ], "button": { "width": 200,   "height": 22,   'text': 'btn_label' } }
+        { 'type': "Empty" },
+		
+        { 'type': "Label", 'text': 'Development utils' },
+        { 'type': 'CheckBox',   'varName': 'sysMessage',    'value': False,   'text': 'Allow system messages',
+          'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },   
+        { "varName": "reload",   'value': -1,  'type': "RadioButtonGroup", 'text': 'Reload techtree data', "options": [ ], "button": { "width": 200,   "height": 22,   'text': 'Reload' } }
 	]
 }
 
@@ -208,7 +245,26 @@ def onModSettingsChanged(newSettings):
     
 def onButtonClicked(varName, value):    
     print 'onButtonClicked', varName, value
-
+    if varName == "reload":
+        g_techTreeDP.load(True)
+        SystemMessages.pushMessage("Techtree data has been reloaded.", type=SystemMessages.SM_TYPE.Warning)
+    
 CONFIG = g_aTT.setModTemplate('att', template, onModSettingsChanged, onButtonClicked)  
+
+"""print '------------'
+for i in dir(TechTree.flashObject):
+    print i
+    { 'type': 'CheckBox',   'varName': 'autoGap',       'value': True,  'text': 'Automaticaly caltulate gaps',
+		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
+        { 'type': 'RangeSlider','varName': 'gapRange', 'value': [10, 50],   'text': 'Gap size range',
+            'divisionLabelPostfix': '', 'divisionLabelStep': 20, 'divisionStep': 20,
+			'maximum': 60, 'minimum': 0,	'minRangeDistance': 0,	'snapInterval': 1
+		},  
+		{ 'type': 'NumericStepper', 'text': 'Gap size range',
+			'tooltip': '{HEADER}NumericStepper tooltip header{/HEADER}{BODY}NumericStepper tooltip body{/BODY}',
+			'minimum': 1, 'maximum': 15, 'snapInterval': 1,	'value': 5,	'varName': 'numStepperTest'
+		},
+    
+print '------------'"""
 
 g_aTechTree = aTechTree()
