@@ -1,7 +1,7 @@
 import tempfile, subprocess, os, shutil, zipfile, glob
 import xml.etree.ElementTree as ET
 import time, sys
-                   
+
 def getVersion(wot):
     """ Check paths.xml for current game version """
     p = 'fail'
@@ -15,7 +15,6 @@ def copyXML(SOURCE, destPath):
         if file.endswith(".xml"):
             shutil.copy2(os.path.join(SOURCE,file),destPath)
     
-
 def main(SOURCE = './xml/jbDefault', WOT = "D:/World_of_Tanks_EU"):
     # runtime
     print "---    XML Export to game    ----"
@@ -30,15 +29,14 @@ def main(SOURCE = './xml/jbDefault', WOT = "D:/World_of_Tanks_EU"):
     copyXML(SOURCE,destPath)
     if not len(cmd):
         shutil.copy2("tree-shared.xml",destPath)
-
-    print "         Done, Tree-Shared-XML:", True if(len(cmd)) else False
+    
     cmd = raw_input("> RELEASE XML files?")
     if len(cmd):
         copyXML(SOURCE, '../techtreeRelease/{}'.format(SOURCE[2:]) )
-        
+    
+    print "         Done, Tree-Shared-XML:", True if(len(cmd)) else False
     
 if __name__ == "__main__":
     while True:
         main(*sys.argv[1:])
-        time.sleep(1)     
-     
+        time.sleep(1)
