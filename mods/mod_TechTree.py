@@ -1,4 +1,4 @@
-﻿__version__ = "0.4.2"
+﻿__version__ = "0.5.0"
 print "[LOADMOD] (aTechTree) v.{} {}".format(__version__, "21-03-13")
 """ 
  Advanced TechTree by Johny_Bafak
@@ -15,8 +15,8 @@ print "[LOADMOD] (aTechTree) v.{} {}".format(__version__, "21-03-13")
     
 """
 # Common
-import inspect, functools
-import ResMgr, BigWorld
+import inspect, functools, os, zipfile
+import ResMgr, BigWorld, nations
 from gui import SystemMessages
 
 # Mod settings API
@@ -35,7 +35,9 @@ from gui.Scaleform.daapi.view.lobby.techtree.techtree_dp import g_techTreeDP
 from gui.Scaleform.daapi.view.lobby.techtree.techtree_page import TechTree
 from gui.Scaleform.daapi.view.lobby.techtree.data import NationTreeData, ResearchItemsData
 from gui.Scaleform.genConsts.NODE_STATE_FLAGS import NODE_STATE_FLAGS
+import gui.Scaleform.daapi.view.lobby.techtree.settings as SETT
 CONFIG = {}
+LAYOUTS = []
 """         Common utils:
                 @override               override standart function
 """
@@ -115,6 +117,7 @@ class aTechTree():
         override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__getLineInfo', self._getLineInfo)
         override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNodeList', self._readNodeList)
         override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNation', self._readNation)
+        #tree-share path
     
     def load(hook, baseFunc, self, nationID, override = None):
         """ techtree.data.NationTreeData.load """
@@ -187,6 +190,8 @@ class aTechTree():
             return baseFunc(self, parentCD, nation, xmlCtx, section, shared)
             
     def _readNodeList(hook, baseFunc, self, shared, nation, xmlPath, clearCache=False):
+        print xmlPath
+        print ResMgr.isFile(xmlPath)
         if CONFIG.get('sysMessage'):
             try:
                 displayInfo, displaySettings, gridSettings = baseFunc(self, shared, nation, xmlPath, clearCache)
@@ -194,16 +199,43 @@ class aTechTree():
                 SystemMessages.pushMessage(msg, type=SystemMessages.SM_TYPE.Error)
             return (displayInfo, displaySettings, gridSettings)
             
-        else: 
+        else:
             return baseFunc(self, shared, nation, xmlPath, clearCache)
     
     def _readNation(hook, baseFunc, self, shared, nation, clearCache=False):
         try:
-            return baseFunc(self, shared, nation, clearCache=False)
-        except: 
-            return {}
+            xmlPath = "../mods/configs/techtree/{}/{}-tree.xml".format( LAYOUTS[CONFIG.get('layout')], nation)
+            ResMgr.purge(xmlPath)
+            displayInfo, displaySettings, gridSettings = self._TechTreeDataProvider__readNodeList(shared, nation, xmlPath, clearCache)
+            xmlPath = "../mods/configs/techtree/{}/{}-premium.xml".format( LAYOUTS[CONFIG.get('layout')], nation)
+            ResMgr.purge(xmlPath)
+            premDisplayInfo, _, gridPremiumSettings = self._TechTreeDataProvider__readNodeList(shared, nation, xmlPath, clearCache)
+            nationID = nations.INDICES[nation]
+            self._TechTreeDataProvider__displaySettings[nationID] = displaySettings
+            self._TechTreeDataProvider__gridSettings[nationID] = gridSettings
+            self._TechTreeDataProvider__premiumGridSettings[nationID] = gridPremiumSettings
+            displayInfo.update(premDisplayInfo)
+            return displayInfo
+        except Exception as err:
+            print err
+            return {}  
+
+def getLayouts():
+    data = []
+    if os.path.isfile('./mods/configs/techtree/xml.zip'):
+        with zipfile.ZipFile('./mods/configs/techtree/xml.zip') as zf:
+            data = [ 'xml.zip/{}'.format(lo[:-1]) for lo in zf.namelist() if lo.endswith('/') ]
+    else: 
+        print "[NOTE] AdvancedTechTree: Layout data file could not be loaded."
     
-UIv = 16
+    for name in os.listdir("mods/configs/techtree"):
+        if os.path.isfile("mods/configs/techtree/{}/ussr-tree.xml".format(name)):
+            data.append(name)
+            
+    return data
+    
+LAYOUTS = getLayouts()
+UIv = 18
 template  = {
 	'modDisplayName': 'Advanced TechTree {ver}#{ui}'.format(ver=__version__, ui=UIv),
 	'enabled': True,
@@ -225,10 +257,7 @@ template  = {
         { 'type': "Empty" },
         { 'type': 'Dropdown', 'varName': 'layout',          'value': 0,     'text': 'TechtTree layout',       
           'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]',
-		  'width': 400, 'options':  [
-				{ 'label': 'jbDefault' },
-				{ 'label': 'KukieJar' }
-			]
+		  'width': 400, 'options':  [ { 'label': x } for x in LAYOUTS ]
 		},
         { 'type': "Empty" },
         { 'type': "Empty" },
@@ -239,6 +268,7 @@ template  = {
         { "varName": "reload",   'value': -1,  'type': "RadioButtonGroup", 'text': 'Reload techtree data', "options": [ ], "button": { "width": 200,   "height": 22,   'text': 'Reload' } }
 	]
 }
+g_aTT.TPL["att"]["column2"][1]["options"] = [ { 'label': x } for x in LAYOUTS ]
 
 def onModSettingsChanged(newSettings):    
     CONFIG.update(newSettings)
