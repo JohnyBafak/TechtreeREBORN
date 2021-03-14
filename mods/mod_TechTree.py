@@ -1,4 +1,4 @@
-﻿__version__ = "0.5.0"
+﻿__version__ = "0.5.2"
 print "[LOADMOD] (aTechTree) v.{} {}".format(__version__, "21-03-13")
 """ 
  Advanced TechTree by Johny_Bafak
@@ -15,7 +15,7 @@ print "[LOADMOD] (aTechTree) v.{} {}".format(__version__, "21-03-13")
     
 """
 # Common
-import inspect, functools, os, zipfile
+import inspect, functools, os, zipfile, urllib
 import ResMgr, BigWorld, nations
 from gui import SystemMessages
 
@@ -220,41 +220,56 @@ class aTechTree():
             print err
             return {}  
 
-def getLayouts():
-    data = []
-    if os.path.isfile('mods/configs/techtree/xml.pkg'):
-        with zipfile.ZipFile('mods/configs/techtree/xml.pkg') as zf:
-            data = list(set([os.path.split(x)[0] for x in zf.namelist() if '/' in x]))
-            zf.extractall("mods/configs/techtree/xml/")
-        os.remove('mods/configs/techtree/xml.pkg')
+
+def DB_upd(dbFile):
+    try:
+        urllib.urlretrieve ('https://github.com/JohnyBafak/techtreeRelease/raw/main/xml/xml.pkg', dbFile )
+        if os.path.isfile( dbFile ):
+            with zipfile.ZipFile(dbFile) as zf:
+                
+                zf.extractall( dbFile[:-4] )  # folder name
+            os.remove( dbFile )
+        else:
+            raise
+    except Exception as E: print "[ERROR] (aTechTree): Update failed! (%s)" % E
+
+def DB_check(dbF):
+    # lookup available DB version
+    try:
+        f = urllib.urlopen( "https://raw.githubusercontent.com/JohnyBafak/techtreeRelease/main/xml/db.ver" ) 
+        ver = int( f.read() )
+    except: ver = 0
     
+    # check if local DB excists & download if not
+    if not os.path.isfile("mods/configs/techtree/xml/db.ver"):
+        print "[NOTE] (aTechTree): No DB.ver file, downloading current db version", ver
+        DB_upd(dbF)
+        return ver, ver
+        
+    # lookup local DB version
+    with open("mods/configs/techtree/xml/db.ver") as f:
+        cur = int( f.read() )
+    print "[NOTE] (aTechTree): Checking for database updates: Current v.{}; Available v.{}".format(cur, ver)
+
+    if ver > cur:
+        print "[NOTE] (aTechTree): Updates found database v.{}".format(ver)
+        if CONFIG.get('update'):
+            print "updating...", CONFIG.get('update')
+            DB_upd(dbF)
+            cur = ver         
+    return cur, ver
+
+def getLayouts():
+    print ResMgr.isFile('../mods/configs/techtree/xml.zip/db.ver')
+    print ResMgr.isFile('../mods/configs/techtree/xml.zip')
+    
+    data = []
     for name in os.listdir("mods/configs/techtree/xml"):
         if os.path.isfile("mods/configs/techtree/xml/{}/ussr-tree.xml".format(name)):
             data.append(name)
-    return data
+    return data.sort()
     
-def updateDB():
-    ver = cur = 0
-    if os.path.isfile("mods/configs/techtree/xml/version"):
-        with open("mods/configs/techtree/xml/version") as f:
-            line = f.read()
-            if len(line): cur = int(line)
-
-    import urllib
-    print "[NOTE] AdvancedTechTree: Checking for database updates (Current #%s)" % cur
-    try:
-        f = urllib.urlopen( "https://raw.githubusercontent.com/JohnyBafak/techtreeRelease/main/xml/version" ) 
-        ver = int( f.read() )
-        print "found", cur, ver
-        if ver > cur:
-            print "[NOTE] AdvancedTechTree: Updates found database #{} (Latest #{})".format(cur, ver)
-            if CONFIG.get('update'):
-                urllib.urlretrieve ('https://github.com/JohnyBafak/techtreeRelease/raw/main/xml/xml.pkg', ResMgr.resolveToAbsolutePath("mods/configs/techtree/xml.pkg") )
-			
-    except Exception as E: print "[ERROR] AdvancedTechTree: Update failed! (%s)" % E
-    return cur, ver
-    
-UIv = 19
+UIv = 20
 template  = {
 	'modDisplayName': 'Advanced TechTree {ver}#{ui}'.format(ver=__version__, ui=UIv),
 	'enabled': True,
@@ -268,6 +283,7 @@ template  = {
 		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
         { 'type': 'CheckBox',   'varName': 'showEvent',     'value': True,  'text': "Show event tanks in techtree",
 		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
+        { 'type': "Empty" },
         { 'type': 'CheckBox',   'varName': 'dataUpdate',    'value': False,  'text': 'Allow techtree data update',
           'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' }
 	],
@@ -289,22 +305,35 @@ template  = {
 
 def onModSettingsChanged(newSettings):    
     CONFIG.update(newSettings)
-    print newSettings
+    print 'onModSettingsChanged', newSettings
     
 def onButtonClicked(varName, value):    
     print 'onButtonClicked', varName, value
     if varName == "reload":
         g_techTreeDP.load(True)
-        SystemMessages.pushMessage("Techtree data has been reloaded.", type=SystemMessages.SM_TYPE.Warning)
-    
+        if CONFIG.get('sysMessage'):
+            SystemMessages.pushMessage("Techtree data has been reloaded.", type=SystemMessages.SM_TYPE.Warning)
+        
+    elif varName == "update":
+        DB_upd('mods/configs/techtree/xml.pkg')
+        if g_aTT.TPL["att"]["column2"][2].get('button'):
+            g_aTT.TPL["att"]["column2"][2].pop('button', None)
+        
+        with open("mods/configs/techtree/xml/db.ver") as f: 
+            ver = f.read()
+            
+        g_aTT.TPL["att"]["column2"][2]['text'] = "Current layout data version v{} - {}".format(ver, ver)
+        SystemMessages.pushMessage("Database updated to v.{}".format(ver), type=SystemMessages.SM_TYPE.Information)
+
 CONFIG = g_aTT.setModTemplate('att', template, onModSettingsChanged, onButtonClicked)  
 
-cur, ver = updateDB()
+cur, ver = DB_check('mods/configs/techtree/xml.pkg')
+LAYOUTS = getLayouts()
+
 g_aTT.TPL["att"]["column2"][2]['text'] = "Current layout data version v{} - {}".format(cur, ver)
 if ver > cur:
     g_aTT.TPL["att"]["column2"][2]['button'] = { "width": 200,   "height": 22,   'text': "Download ver #{}".format(ver) } 
-    
-LAYOUTS = getLayouts()
+
 g_aTT.TPL["att"]["column2"][1]["options"] = [ { 'label': x } for x in LAYOUTS ]
 
 
