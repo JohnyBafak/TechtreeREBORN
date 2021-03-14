@@ -1,4 +1,4 @@
-﻿__version__ = "0.5.2"
+﻿__version__ = "0.5.3"
 print "[LOADMOD] (aTechTree) v.{} {}".format(__version__, "21-03-13")
 """ 
  Advanced TechTree by Johny_Bafak
@@ -249,29 +249,26 @@ def DB_check(dbF):
     # lookup local DB version
     with open("mods/configs/techtree/xml/db.ver") as f:
         cur = int( f.read() )
-    print "[NOTE] (aTechTree): Checking for database updates: Current v.{}; Available v.{}".format(cur, ver)
+    print "[NOTE] (aTechTree): Checking for database updates: Current #{}; Available #{}".format(cur, ver)
 
     if ver > cur:
-        print "[NOTE] (aTechTree): Updates found database v.{}".format(ver)
-        if CONFIG.get('update'):
+        if CONFIG.get('dataUpdate'):
             print "updating...", CONFIG.get('update')
             DB_upd(dbF)
             cur = ver         
     return cur, ver
 
 def getLayouts():
-    print ResMgr.isFile('../mods/configs/techtree/xml.zip/db.ver')
-    print ResMgr.isFile('../mods/configs/techtree/xml.zip')
-    
     data = []
     for name in os.listdir("mods/configs/techtree/xml"):
         if os.path.isfile("mods/configs/techtree/xml/{}/ussr-tree.xml".format(name)):
             data.append(name)
-    return data.sort()
+    data.sort()
+    return data
     
 UIv = 20
 template  = {
-	'modDisplayName': 'Advanced TechTree {ver}#{ui}'.format(ver=__version__, ui=UIv),
+	'modDisplayName': 'Advanced TechTree {ver}-{ui}'.format(ver=__version__, ui=UIv),
 	'enabled': True,
     'UIver': UIv,
 	'column1': [
@@ -289,7 +286,7 @@ template  = {
 	],
 	'column2': [
         { 'type': "Empty" },
-        { 'type': 'Dropdown', 'varName': 'layout',          'value': 0,     'text': 'TechtTree layout',       
+        { 'type': 'Dropdown', 'varName': 'layout',          'value': 1,     'text': 'TechtTree layout',       
           'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]',
 		  'width': 400, 'options':  []
 		},
@@ -322,17 +319,17 @@ def onButtonClicked(varName, value):
         with open("mods/configs/techtree/xml/db.ver") as f: 
             ver = f.read()
             
-        g_aTT.TPL["att"]["column2"][2]['text'] = "Current layout data version v{} - {}".format(ver, ver)
-        SystemMessages.pushMessage("Database updated to v.{}".format(ver), type=SystemMessages.SM_TYPE.Information)
+        g_aTT.TPL["att"]["column2"][2]['text'] = "Current layout data version #{}".format(ver)
+        SystemMessages.pushMessage("Database updated to #{}".format(ver), type=SystemMessages.SM_TYPE.Information)
 
 CONFIG = g_aTT.setModTemplate('att', template, onModSettingsChanged, onButtonClicked)  
 
 cur, ver = DB_check('mods/configs/techtree/xml.pkg')
 LAYOUTS = getLayouts()
 
-g_aTT.TPL["att"]["column2"][2]['text'] = "Current layout data version v{} - {}".format(cur, ver)
+g_aTT.TPL["att"]["column2"][2]['text'] = "Current layout data version #{}".format(cur)
 if ver > cur:
-    g_aTT.TPL["att"]["column2"][2]['button'] = { "width": 200,   "height": 22,   'text': "Download ver #{}".format(ver) } 
+    g_aTT.TPL["att"]["column2"][2]['button'] = { "width": 200,   "height": 22,   'text': "Download #{}".format(ver) } 
 
 g_aTT.TPL["att"]["column2"][1]["options"] = [ { 'label': x } for x in LAYOUTS ]
 
