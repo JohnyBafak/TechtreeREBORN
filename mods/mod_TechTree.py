@@ -222,20 +222,39 @@ class aTechTree():
 
 def getLayouts():
     data = []
-    if os.path.isfile('./mods/configs/techtree/xml.zip'):
-        with zipfile.ZipFile('./mods/configs/techtree/xml.zip') as zf:
-            data = [ 'xml.zip/{}'.format(lo[:-1]) for lo in zf.namelist() if lo.endswith('/') ]
-    else: 
-        print "[NOTE] AdvancedTechTree: Layout data file could not be loaded."
+    if os.path.isfile('mods/configs/techtree/xml.pkg'):
+        with zipfile.ZipFile('mods/configs/techtree/xml.pkg') as zf:
+            data = list(set([os.path.split(x)[0] for x in zf.namelist() if '/' in x]))
+            zf.extractall("mods/configs/techtree/xml/")
+        os.remove('mods/configs/techtree/xml.pkg')
     
-    for name in os.listdir("mods/configs/techtree"):
-        if os.path.isfile("mods/configs/techtree/{}/ussr-tree.xml".format(name)):
+    for name in os.listdir("mods/configs/techtree/xml"):
+        if os.path.isfile("mods/configs/techtree/xml/{}/ussr-tree.xml".format(name)):
             data.append(name)
-            
     return data
     
-LAYOUTS = getLayouts()
-UIv = 18
+def updateDB():
+    ver = cur = 0
+    if os.path.isfile("mods/configs/techtree/xml/version"):
+        with open("mods/configs/techtree/xml/version") as f:
+            line = f.read()
+            if len(line): cur = int(line)
+
+    import urllib
+    print "[NOTE] AdvancedTechTree: Checking for database updates (Current #%s)" % cur
+    try:
+        f = urllib.urlopen( "https://raw.githubusercontent.com/JohnyBafak/techtreeRelease/main/xml/version" ) 
+        ver = int( f.read() )
+        print "found", cur, ver
+        if ver > cur:
+            print "[NOTE] AdvancedTechTree: Updates found database #{} (Latest #{})".format(cur, ver)
+            if CONFIG.get('update'):
+                urllib.urlretrieve ('https://github.com/JohnyBafak/techtreeRelease/raw/main/xml/xml.pkg', ResMgr.resolveToAbsolutePath("mods/configs/techtree/xml.pkg") )
+			
+    except Exception as E: print "[ERROR] AdvancedTechTree: Update failed! (%s)" % E
+    return cur, ver
+    
+UIv = 19
 template  = {
 	'modDisplayName': 'Advanced TechTree {ver}#{ui}'.format(ver=__version__, ui=UIv),
 	'enabled': True,
@@ -250,16 +269,15 @@ template  = {
         { 'type': 'CheckBox',   'varName': 'showEvent',     'value': True,  'text': "Show event tanks in techtree",
 		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
         { 'type': 'CheckBox',   'varName': 'dataUpdate',    'value': False,  'text': 'Allow techtree data update',
-          'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
-        { "varName": "update",   'value': -1,  'type': "RadioButtonGroup", 'text': 'Update data', "options": [ ], "button": { "width": 200,   "height": 22,   'text': 'xxx' } }
+          'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' }
 	],
 	'column2': [
         { 'type': "Empty" },
         { 'type': 'Dropdown', 'varName': 'layout',          'value': 0,     'text': 'TechtTree layout',       
           'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]',
-		  'width': 400, 'options':  [ { 'label': x } for x in LAYOUTS ]
+		  'width': 400, 'options':  []
 		},
-        { 'type': "Empty" },
+        { "varName": "update",   'value': -1,  'type': "RadioButtonGroup", 'text': 'Update data', "options": [ ] },
         { 'type': "Empty" },
 		
         { 'type': "Label", 'text': 'Development utils' },
@@ -268,10 +286,10 @@ template  = {
         { "varName": "reload",   'value': -1,  'type': "RadioButtonGroup", 'text': 'Reload techtree data', "options": [ ], "button": { "width": 200,   "height": 22,   'text': 'Reload' } }
 	]
 }
-g_aTT.TPL["att"]["column2"][1]["options"] = [ { 'label': x } for x in LAYOUTS ]
 
 def onModSettingsChanged(newSettings):    
     CONFIG.update(newSettings)
+    print newSettings
     
 def onButtonClicked(varName, value):    
     print 'onButtonClicked', varName, value
@@ -280,6 +298,15 @@ def onButtonClicked(varName, value):
         SystemMessages.pushMessage("Techtree data has been reloaded.", type=SystemMessages.SM_TYPE.Warning)
     
 CONFIG = g_aTT.setModTemplate('att', template, onModSettingsChanged, onButtonClicked)  
+
+cur, ver = updateDB()
+g_aTT.TPL["att"]["column2"][2]['text'] = "Current layout data version v{} - {}".format(cur, ver)
+if ver > cur:
+    g_aTT.TPL["att"]["column2"][2]['button'] = { "width": 200,   "height": 22,   'text': "Download ver #{}".format(ver) } 
+    
+LAYOUTS = getLayouts()
+g_aTT.TPL["att"]["column2"][1]["options"] = [ { 'label': x } for x in LAYOUTS ]
+
 
 """print '------------'
 for i in dir(TechTree.flashObject):
