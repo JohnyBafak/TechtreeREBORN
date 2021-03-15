@@ -25,7 +25,7 @@ When run without any params performs comparison for all layouts
       @param8 = ignore collector's vehicles (SH)
             
 Functions:
-    ``` python 
+    ```python 
     # when param is set to True vehicle type will be ignored in comparison
     readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = False, collector=False):
     Compare( data, layout='_jbDefault' )
