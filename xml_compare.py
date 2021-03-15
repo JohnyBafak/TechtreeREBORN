@@ -23,13 +23,11 @@ import sys, os, time
 def getVersion(game):
         """ Check paths.xml for current game version """
         global VER
-        path = game + '/paths.xml'
-        tree = ET.parse(path)
+        tree = ET.parse(game + '/paths.xml')
         VER = tree.find("Paths")[0].text.split('mods/')[1]
         
 def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = True, collector=False):
     getVersion(WOT)
-    global NATIONS, VER
     data = {nation: {} for nation in NATIONS}
     fname = '{}/mods/{}_tankList.csv'.format( WOT, VER )
     if os.path.isfile( fname ):
@@ -61,21 +59,20 @@ def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL =
 
 class Compare():
     def __init__(self, data, name = "_jbDefault"):
-        global VER
         self.LAYOUT = {}
         self.GAME = data
         for nation in NATIONS:
             self.LAYOUT[nation] = self.readLayout(nation, name)
         
-        self.checkDiff(name,VER)
+        self.checkDiff(name)
         
         print "Done."
     
-    def checkDiff(self, name, ver):
+    def checkDiff(self, name):
         fname = '{}compare_{}.txt'.format(DIR, name)
         print "writting", fname
         with open (fname, "w") as f:
-            f.write("xml_compare_missing for game version {}\n".format(ver))
+            f.write("xml_compare_missing for game version {}\n".format(VER))
             for nation in NATIONS:
                 inGame = list(self.GAME[nation].keys() )
                 XML = list(self.LAYOUT[nation])
