@@ -35,7 +35,7 @@ Functions:
 
 ```python 
 # when param is set to True vehicle type will be ignored in comparison
-readGame(wot = "D:/World_of_Tanks_EU", igr = True, bot = True, bob = True, fl = True, sh = False, collector = False):
+readGame(wot="D:/World_of_Tanks_EU", igr=True, bot=True, bob=True, fl=True, sh=False, collector=False):
 Compare( data, layout='_jbDefault' )
 ```
 getTanks repport for current game version is required to succesfully run this program.
@@ -59,7 +59,7 @@ if cmd is not None program will override layout data in release version
 #### ``` xml_report.py ```
 
 Layout specific xml_compare
-- jbDefaul: does not ignore Steel Hunters Vehicles
+- jbDefault: does not ignore Steel Hunters Vehicles
 - KukieJar: ignore collector's vehicles
 
 
