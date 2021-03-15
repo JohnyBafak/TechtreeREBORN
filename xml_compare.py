@@ -14,24 +14,24 @@
 """
 __version__ = "1.0.0"
 NATIONS = [ "czech", "france", "germany", "china", "italy", "japan", "poland", "sweden", "uk", "usa", "ussr" ]
-GAME = {nation: {} for nation in NATIONS}
 DIR = "../techtreeRelease/xml/"
+VER = "fail"
 
 from xml.etree import cElementTree as ET
 import sys, os, time
 
 def getVersion(game):
         """ Check paths.xml for current game version """
-        p = 'fail'
+        global VER
         path = game + '/paths.xml'
         tree = ET.parse(path)
-        p = tree.find("Paths")[0].text.split('mods/')[1]
-        return p   
+        VER = tree.find("Paths")[0].text.split('mods/')[1]
         
-def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = False):
-    ver = getVersion(WOT)
-    fname = '{}/mods/{}_tankList.csv'.format( WOT, ver )
-    global GAME
+def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = True, collector=False):
+    getVersion(WOT)
+    global NATIONS, VER
+    data = {nation: {} for nation in NATIONS}
+    fname = '{}/mods/{}_tankList.csv'.format( WOT, VER )
     if os.path.isfile( fname ):
         with open(fname) as f:
             delim = f.readline()[6]  
@@ -51,19 +51,23 @@ def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL =
                     if name.endswith("_FL"):    continue
                 if SH:
                     if name.endswith("_SH"):    continue
+                if collector:
+                    if X[12] == "True": continue
                 
-                val = { "lvl": X[5], "cls": X[6] , "gold": X[7] , "hid":X[9] }
-                GAME[nat][name] = val
+                val = { "lvl": X[5], "cls": X[6] , "gold": X[7] , "hid":X[9], "col":X[12] }
+                data[nat][name] = val
     else: raise IOError("[Errno 2] No such file or directory: '{}' Generate vehicle list using jb.getTank first".format(fname))
-    return ver
+    return data
 
 class Compare():
-    def __init__(self, ver, name = "_jbDefault"):
+    def __init__(self, data, name = "_jbDefault"):
+        global VER
         self.LAYOUT = {}
+        self.GAME = data
         for nation in NATIONS:
             self.LAYOUT[nation] = self.readLayout(nation, name)
         
-        self.checkDiff(name,ver)
+        self.checkDiff(name,VER)
         
         print "Done."
     
@@ -73,15 +77,15 @@ class Compare():
         with open (fname, "w") as f:
             f.write("xml_compare_missing for game version {}\n".format(ver))
             for nation in NATIONS:
-                inGame = list(GAME[nation].keys() )
+                inGame = list(self.GAME[nation].keys() )
                 XML = list(self.LAYOUT[nation])
                 newList = list(set(inGame) - set(XML))
                 oldList = list(set(XML) - set(inGame))
-                f.write("\n-T----class----gold--hidd-name------------- new {} [{}]\n".format(nation, len(newList) ) ) 
+                f.write("\n-T----class---gold--hidd-colect-name------------- new {} [{}]\n".format(nation, len(newList) ) ) 
                 
                 for veh in newList:
-                    data = GAME[nation][veh]
-                    f.write("{:>2} {:>10} {:>5} {:>5} {}\n".format(data['lvl'], data['cls'], data['gold'], data['hid'], veh ) )
+                    data = self.GAME[nation][veh]
+                    f.write("{:>2} {:>10} {:>5} {:>5} {:>5} {}\n".format(data['lvl'], data['cls'], data['gold'], data['hid'], data['col'], veh ) )
                     #line_new = '{:>12}  {:>12}  {:>12}'.format(word[0], word[1], word[2])
                 f.write("xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed \n")
                 for veh in oldList:
@@ -102,13 +106,13 @@ class Compare():
 
 
 if __name__ == "__main__":
-    ver = readGame(*sys.argv[2:])
+    data = readGame(*sys.argv[2:])
     if len(sys.argv) > 1:
-        Compare(ver, sys.argv[1])
+        Compare(data, sys.argv[1])
     else: 
         for name in os.listdir(DIR):
             if os.path.isdir(DIR+name):
-                Compare(ver, name)
+                Compare(data, name)
             
         
     time.sleep(1)

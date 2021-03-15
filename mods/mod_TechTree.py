@@ -1,18 +1,9 @@
 ﻿__version__ = "0.5.4"
-print "[LOADMOD] (aTechTree) v.{} {}".format(__version__, "21-03-13")
+UIv = 21
+print "[LOADMOD] (aTechTree) v.{}# {}".format(__version__,UIv, "21-03-15")
 """ 
  Advanced TechTree by Johny_Bafak
  http://forum.worldoftanks.eu/index.php?/topic/514277-
- 
- Functionality:
-    @override 
-    preview for all tanks
-    unlock comparison
-    techtree class
-        load all tanks
-        set node state
-    
-    
 """
 # Common
 import inspect, functools, os, zipfile, urllib
@@ -295,7 +286,6 @@ def getLayouts():
     data.sort()
     return data
     
-UIv = 20
 template  = {
 	'modDisplayName': 'Advanced TechTree {ver}-{ui}'.format(ver=__version__, ui=UIv),
 	'enabled': True,
