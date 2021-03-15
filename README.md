@@ -1,20 +1,15 @@
-# TechtreeREBORN
+# TechtreeREBORN Files
 
-xxx Files
-
-- ``` ./build/ ``` Folder
-
+### ``` ./build/ ``` Folder
 Used with my *_build.py* file contains files used for .wotmod  
 
-- ``` ./xml/  ``` Folder
-
+###  ``` ./xml/  ``` Folder
 contains current defaul layout files (development version - more up to date, may not work
 
-- ``` ./mods/ ``` Folder
-
+### ``` ./mods/ ``` Folder
 Contains all script files + modsListAPI icon source file
 
-- ``` xml_compare.py ```
+### ``` xml_compare.py ```
 
 Useful for creating current layouts reports, can be used standalone, from cmd line or as a module
 When run without any params performs comparison for all layouts
@@ -32,7 +27,7 @@ When run without any params performs comparison for all layouts
     readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = False, collector=False):
     Compare( data, @layout_folder )
   
-- ``` xml_export.py ``` 
+### ``` xml_export.py ``` 
 
 Exports development layout data into game folder & into release GitHub
 Can work both as a module or standalone
