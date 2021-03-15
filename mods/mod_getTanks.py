@@ -1,5 +1,5 @@
-__version__ = "0.5.0"
-print "[LOADMOD] (aTechTree) getTanks v.{} {}".format(__version__, "21-03-01")
+__version__ = "0.5.1"
+print "[LOADMOD] (aTechTree) getTanks v.{} {}".format(__version__, "21-03-15")
 
 import ResMgr, nations, os
 from items import vehicles as vehicles_core
@@ -21,6 +21,7 @@ def tagClear(data, atr=[], res=[]):
     return res, data
           
 def gtNationLoad(natID, veh, path, ignore = []):
+    print "[NOTE] (getTanks): Loading nation", natID, nations[natID]
     tanks = veh.getList(natID)
     num = 0
     g_techTreeDP.load()
@@ -92,6 +93,7 @@ def updateTemplate():
     g_aTT.TPL["gtl"]["column2"][3]["text"] = "Last generated for: {}".format(PATH.rpartition('/')[2]) if os.path.isfile(PATH + "_tankList.csv") else "Not generated yet"    
 
 def startList():
+    print "[NOTE] (getTanks): Loading vehicle list from game"
     vehList = vehicles_core.VehicleList()
     tankIgnore = readIgnore()
     count = 0
@@ -104,7 +106,7 @@ def startList():
         if CONFIG.get('ignore'):
             ignore=[k for k in tankIgnore if nation in k]
         count += gtNationLoad(i, vehList, PATH, ignore)
-    
+    print "[NOTE] (getTanks): Vehicle list created, found {} tanks".format(count)
     return count
 
 def onGTSettings(newSettings):    
@@ -124,7 +126,7 @@ if g_aTT:
     CONFIG  = {
             'modDisplayName': 'GetTanks {ver}'.format(ver=__version__),
             'enabled': True,
-            'UIver': 7,
+            'UIver': 51,
             'column1': [ 
                 { 'type': 'CheckBox',   'varName': 'ignore', 'value': False,  'text': 'Ignore vehicles specified in ignoreList',
                 'tooltip': '{HEADER}Heade{/HEADER}{BODY}body{/BODY}' },
