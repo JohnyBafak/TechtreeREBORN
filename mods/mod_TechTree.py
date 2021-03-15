@@ -1,4 +1,4 @@
-﻿__version__ = "0.5.3"
+﻿__version__ = "0.5.4"
 print "[LOADMOD] (aTechTree) v.{} {}".format(__version__, "21-03-13")
 """ 
  Advanced TechTree by Johny_Bafak
@@ -113,11 +113,16 @@ class aTechTree():
         override(TechTree, 'goToNextVehicle', self.goToNextVehicle)                     # Reseasch page crash
         # error handle
         import gui.Scaleform.daapi.view.lobby.techtree.techtree_dp as TT_dp
+        print TT_dp.TREE_SHARED_REL_FILE_PATH
+        TT_dp.TREE_SHARED_REL_FILE_PATH = "../mods/configs/techtree/xml/{}/tree-shared.xml".format( LAYOUTS[ CONFIG.get('layout') ] )
+        print TT_dp.TREE_SHARED_REL_FILE_PATH
         override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNodeLines', self._readNodeLines)
         override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__getLineInfo', self._getLineInfo)
         override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNodeList', self._readNodeList)
         override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNation', self._readNation)
         #tree-share path
+        override(TT_dp._TechTreeDataProvider,'getAvailableNations', self.getAvailableNations)
+        override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readDefaultLine', self._readDefaultLine)
     
     def load(hook, baseFunc, self, nationID, override = None):
         """ techtree.data.NationTreeData.load """
@@ -168,6 +173,7 @@ class aTechTree():
             baseFunc(self, vehCD)
         
     def _getLineInfo(hook, baseFunc, self, xmlCtx, lineName, nodeCD, outPin, inPin, lineShared):
+        """ techtree_dp """
         if CONFIG.get('sysMessage'):
             try:
                 res = baseFunc(self, xmlCtx, lineName, nodeCD, outPin, inPin, lineShared)
@@ -179,6 +185,7 @@ class aTechTree():
             return baseFunc(self, xmlCtx, lineName, nodeCD, outPin, inPin, lineShared)
             
     def _readNodeLines(hook, baseFunc, self, parentCD, nation, xmlCtx, section, shared):
+        """ techtree_dp """
         if CONFIG.get('sysMessage'):
             try:
                 lines = baseFunc(self, parentCD, nation, xmlCtx, section, shared)
@@ -190,8 +197,7 @@ class aTechTree():
             return baseFunc(self, parentCD, nation, xmlCtx, section, shared)
             
     def _readNodeList(hook, baseFunc, self, shared, nation, xmlPath, clearCache=False):
-        print xmlPath
-        print ResMgr.isFile(xmlPath)
+        """ techtree_dp """
         if CONFIG.get('sysMessage'):
             try:
                 displayInfo, displaySettings, gridSettings = baseFunc(self, shared, nation, xmlPath, clearCache)
@@ -203,11 +209,12 @@ class aTechTree():
             return baseFunc(self, shared, nation, xmlPath, clearCache)
     
     def _readNation(hook, baseFunc, self, shared, nation, clearCache=False):
+        """ techtree_dp """
         try:
-            xmlPath = "../mods/configs/techtree/{}/{}-tree.xml".format( LAYOUTS[CONFIG.get('layout')], nation)
+            xmlPath = "../mods/configs/techtree/xml/{}/{}-tree.xml".format( LAYOUTS[CONFIG.get('layout')], nation)
             ResMgr.purge(xmlPath)
             displayInfo, displaySettings, gridSettings = self._TechTreeDataProvider__readNodeList(shared, nation, xmlPath, clearCache)
-            xmlPath = "../mods/configs/techtree/{}/{}-premium.xml".format( LAYOUTS[CONFIG.get('layout')], nation)
+            xmlPath = "../mods/configs/techtree/xml/{}/{}-premium.xml".format( LAYOUTS[CONFIG.get('layout')], nation)
             ResMgr.purge(xmlPath)
             premDisplayInfo, _, gridPremiumSettings = self._TechTreeDataProvider__readNodeList(shared, nation, xmlPath, clearCache)
             nationID = nations.INDICES[nation]
@@ -220,10 +227,32 @@ class aTechTree():
             print err
             return {}  
 
-
+    def getAvailableNations(hook, baseFunc, self):  
+        """ techtree_dp """
+        import gui.Scaleform.daapi.view.lobby.techtree.techtree_dp as TT_dp
+        print "getAvailableNations"
+        print TT_dp.TREE_SHARED_REL_FILE_PATH
+        if self._TechTreeDataProvider__availableNations is None:
+            TREE_SHARED = "../mods/configs/techtree/xml/{}/tree-shared.xml".format( LAYOUTS[ CONFIG.get('layout') ] )
+            section = ResMgr.openSection(TREE_SHARED)
+            if section is None:
+                _xml.raiseWrongXml(None, TREE_SHARED, 'can not open or read')
+            xmlCtx = (None, TREE_SHARED)
+            self._TechTreeDataProvider__availableNations = self._TechTreeDataProvider__readAvailableNations(xmlCtx, section)
+        return self._TechTreeDataProvider__availableNations[:]
+        
+    def _readDefaultLine(hook, baseFunc, self, shared, xmlCtx, section):
+        import gui.Scaleform.daapi.view.lobby.techtree.techtree_dp as TT_dp
+        print "_readDefaultLine"
+        print TT_dp.TREE_SHARED_REL_FILE_PATH
+        baseFunc(self, shared, xmlCtx, section)
+        return
+    
 def DB_upd(dbFile):
     try:
-        urllib.urlretrieve ('https://github.com/JohnyBafak/techtreeRelease/raw/main/xml/xml.pkg', dbFile )
+        #urllib.urlretrieve ('https://github.com/JohnyBafak/techtreeRelease/raw/main/xml/xml.pkg', dbFile )
+        urllib.urlretrieve ('https://bit.ly/3vpK0LK', dbFile )
+        print "(aTechTree): Downloading xml.pkg"
         if os.path.isfile( dbFile ):
             with zipfile.ZipFile(dbFile) as zf:
                 
@@ -242,14 +271,14 @@ def DB_check(dbF):
     
     # check if local DB excists & download if not
     if not os.path.isfile("mods/configs/techtree/xml/db.ver"):
-        print "[NOTE] (aTechTree): No DB.ver file, downloading current db version", ver
+        print "(aTechTree): No DB.ver file, downloading current db version", ver
         DB_upd(dbF)
         return ver, ver
         
     # lookup local DB version
     with open("mods/configs/techtree/xml/db.ver") as f:
         cur = int( f.read() )
-    print "[NOTE] (aTechTree): Checking for database updates: Current #{}; Available #{}".format(cur, ver)
+    print "(aTechTree): Checking for database updates: Current #{}; Available #{}".format(cur, ver)
 
     if ver > cur:
         if CONFIG.get('dataUpdate'):
@@ -303,6 +332,12 @@ template  = {
 def onModSettingsChanged(newSettings):    
     CONFIG.update(newSettings)
     print 'onModSettingsChanged', newSettings
+    if 'layout' in newSettings:
+        print 'changin Tree-shared XML path'
+        import gui.Scaleform.daapi.view.lobby.techtree.techtree_dp as TT_dp
+        print TT_dp.TREE_SHARED_REL_FILE_PATH
+        TT_dp.TREE_SHARED_REL_FILE_PATH = "../mods/configs/techtree/xml/{}/tree-shared.xml".format( LAYOUTS[ CONFIG.get('layout') ] )
+        print TT_dp.TREE_SHARED_REL_FILE_PATH
     
 def onButtonClicked(varName, value):    
     print 'onButtonClicked', varName, value
