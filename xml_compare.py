@@ -4,20 +4,18 @@
     http://forum.worldoftanks.eu/index.php?/topic/514277-
     Check layouts for missing tanks.
     
-    Usage:  @param1 = layout folder name
+    Usage:  @param1 = layout folder name (inside DIR folder)
             @param2 = WoT install directory
             @param3 = ignore IGR (IGR rental acc vehicles)
             @param4 = ignore bootcamp (bot, bootcamp, training)
             @param5 = ignore bob&fallout (bob, fallout)
             @param6 = ignore only for epic battle (FL)
             @param7 = ignore battle royalle (SH)
-            
-
-    Licensed under CC BY-NC-SA 4.0
 """
-__version__ = "0.2.1"
+__version__ = "1.0.0"
 NATIONS = [ "czech", "france", "germany", "china", "italy", "japan", "poland", "sweden", "uk", "usa", "ussr" ]
 GAME = {nation: {} for nation in NATIONS}
+DIR = "../techtreeRelease/xml/"
 
 from xml.etree import cElementTree as ET
 import sys, os, time
@@ -30,7 +28,7 @@ def getVersion(game):
         p = tree.find("Paths")[0].text.split('mods/')[1]
         return p   
         
-def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = True):
+def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = False):
     ver = getVersion(WOT)
     fname = '{}/mods/{}_tankList.csv'.format( WOT, ver )
     global GAME
@@ -60,7 +58,7 @@ def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL =
     return ver
 
 class Compare():
-    def __init__(self, ver, name = "jbDefault"):
+    def __init__(self, ver, name = "_jbDefault"):
         self.LAYOUT = {}
         for nation in NATIONS:
             self.LAYOUT[nation] = self.readLayout(nation, name)
@@ -70,7 +68,7 @@ class Compare():
         print "Done."
     
     def checkDiff(self, name, ver):
-        fname = './xml/compare_{}.txt'.format(name)
+        fname = '{}compare_{}.txt'.format(DIR, name)
         print "writting", fname
         with open (fname, "w") as f:
             f.write("xml_compare_missing for game version {}\n".format(ver))
@@ -87,14 +85,14 @@ class Compare():
                     #line_new = '{:>12}  {:>12}  {:>12}'.format(word[0], word[1], word[2])
                 f.write("xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ------------- removed \n")
                 for veh in oldList:
-                    f.write(veh)
+                    f.write(veh+'\n')
         
     def readLayout(self, nation, name):
-        xmls =  [ "./xml/{}/{}-tree.xml", "./xml/{}/{}-premium.xml" ]
+        xmls =  [ "{}/{}-tree.xml", "{}/{}-premium.xml" ]
         
         nationList = []        
         for path in xmls:
-            tree = ET.parse(path.format(name,nation))
+            tree = ET.parse(DIR + path.format(name,nation))
             root = tree.find("nodes")
             for child in root:
                 nationList.append( child.tag )
@@ -108,8 +106,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         Compare(ver, sys.argv[1])
     else: 
-        for name in os.listdir("./xml/"):
-            if os.path.isdir("./xml/"+name):
+        for name in os.listdir(DIR):
+            if os.path.isdir(DIR+name):
                 Compare(ver, name)
             
         
