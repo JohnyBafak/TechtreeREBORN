@@ -12,10 +12,10 @@ import xml_compare
             @param7 = ignore steel hunters (SH)
             @param8 = ignore collector's vehicles (SH)
             
-    readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = False, collector=False):
+    readGame(wot="D:/World_of_Tanks_EU", igr=True, bot=True, bob=True, fl=True, sh=False, collector=False):
     Compare( data, @layout_folder )
 """
-data = xml_compare.readGame(SH=False)
+data = xml_compare.readGame(sh=False)
 xml_compare.Compare( data, '_jbdefault' )
 
 data = xml_compare.readGame(collector=True)

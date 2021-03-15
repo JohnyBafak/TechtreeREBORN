@@ -26,10 +26,10 @@ def getVersion(game):
         tree = ET.parse(game + '/paths.xml')
         VER = tree.find("Paths")[0].text.split('mods/')[1]
         
-def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = True, collector=False):
-    getVersion(WOT)
+def readGame(wot= "D:/World_of_Tanks_EU", igr = True, bot=True, bob = True, fl = True, sh = True, collector=False):
+    getVersion(wot)
     data = {nation: {} for nation in NATIONS}
-    fname = '{}/mods/{}_tankList.csv'.format( WOT, VER )
+    fname = '{}/mods/{}_tankList.csv'.format( wot, VER )
     if os.path.isfile( fname ):
         with open(fname) as f:
             delim = f.readline()[6]  
@@ -37,7 +37,7 @@ def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL =
                 X = line.rstrip().split(delim)
                 nat = X[0]
                 name = X[1]
-                if IGR and name.endswith("_IGR"): continue
+                if igr and name.endswith("_IGR"): continue
                 if bot:
                     if "_bot" in name: continue
                     elif "_bootcamp" in name: continue
@@ -45,9 +45,9 @@ def readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL =
                 if bob:
                     if name.endswith("_bob"): continue
                     elif name.endswith("_fallout"): continue
-                if FL:
+                if fl:
                     if name.endswith("_FL"):    continue
-                if SH:
+                if sh:
                     if name.endswith("_SH"):    continue
                 if collector:
                     if X[12] == "True": continue
