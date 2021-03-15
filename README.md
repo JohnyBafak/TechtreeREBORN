@@ -29,7 +29,7 @@ Functions:
 
 ```python 
 # when param is set to True vehicle type will be ignored in comparison
-readGame(WOT= "D:/World_of_Tanks_EU", IGR = True, bot=True, bob = True, FL = True, SH = False, collector=False):
+readGame(wot= "D:/World_of_Tanks_EU", igr = True, bot=True, bob = True, fl = True, sh = False, collector=False):
 Compare( data, layout='_jbDefault' )
 ```
   
@@ -41,7 +41,7 @@ Can work both as a module or standalone
 Functions:
 
 ```python
-main(SOURCE = './xml/', WOT = "D:/World_of_Tanks_EU", name='_jbDefault', cmd = None):
+main(source = './xml/', wot = "D:/World_of_Tanks_EU", name='_jbDefault', cmd = None):
 ```
 
 ### ``` xml_report.py ```
