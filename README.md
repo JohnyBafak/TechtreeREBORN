@@ -3,11 +3,17 @@
 #### ``` ./build/ ``` Folder
 Used with my *_build.py* file contains files used for .wotmod  
 
+------
+
 ####  ``` ./xml/  ``` Folder
 contains current defaul layout files (development version - more up to date, may not work
 
+------
+
 #### ``` ./mods/ ``` Folder
 Contains all script files + modsListAPI icon source file
+
+------
 
 #### ``` xml_compare.py ```
 
@@ -33,7 +39,9 @@ readGame(wot = "D:/World_of_Tanks_EU", igr = True, bot = True, bob = True, fl = 
 Compare( data, layout='_jbDefault' )
 ```
 getTanks repport for current game version is required to succesfully run this program.
-  
+
+------
+
 #### ``` xml_export.py ``` 
 
 Exports development layout data into game folder & into release GitHub
@@ -46,6 +54,7 @@ main(source = './xml/', wot = "D:/World_of_Tanks_EU", name = '_jbDefault', cmd =
 ```
 if cmd is not None program will override layout data in release version
 
+------
 
 #### ``` xml_report.py ```
 
