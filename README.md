@@ -1,38 +1,65 @@
-# TechtreeREBORN
+# ![GitHub Logo](https://github.com/JohnyBafak/TechtreeREBORN/blob/main/build/res/gui/maps/icons/atechtree.png?raw=true) TechtreeREBORN Files
 
-## jb.TechTree
-- unlock comparison for all vehicles
-- allow preview for all tanks available in client
-- show all tanks in techtree
-- configure mod ingame
+#### ``` ./build/ ``` Folder
+Used with my *_build.py* file contains files used for .wotmod  
 
-## jb.getTanks
-- scan game for all available vehicles currently in game
-- creates report in form of CSV file in res_mods/<current_version>
+------
 
-As of v0.3.1 the list includes following:
-- nation code
-- techtree file name
-- ingame name
-- in-nation ID
-- compactDescriptionID (used by all game mechanics
-- vehicle level
-- vehicle class (LT, MT, HT, AT, SPG)
-- premium status
-- premiumIGR - vehicles for gameshow accouts
-- hidden - not yet released and/or removed tanks
-- fallout game mode vehicles
-- bob - team clash rental BB tanks
-- epic - FL battles vehicles 
-- battleRoyale - SH steel hunter vehicles
-- collectorVehicle
-- event vehicle
-- *any remaing unresolved tag
+####  ``` ./xml/  ``` Folder
+contains current defaul layout files (development version - more up to date, may not work
 
-# TO-DO:
- - remake techtree_generator
- - add configuration
- - rework vehicle techtree placement 
- - L10n/i18n
+------
+
+#### ``` ./mods/ ``` Folder
+Contains all script files + modsListAPI icon source file
+
+------
+
+#### ``` xml_compare.py ```
+
+Useful for creating current layouts reports, can be used standalone, from cmd line or as a module
+When run without any params performs comparison for all layouts
+```python
+    Usage from CMD line:
+      @param1 = layout folder name (inside DIR folder)
+      @param2 = WoT install directory
+      @param3 = ignore IGR (IGR rental acc vehicles)
+      @param4 = ignore bootcamp (bot, bootcamp, training)
+      @param5 = ignore bob&fallout (bob, fallout)
+      @param6 = ignore only for epic battle (FL)
+      @param7 = ignore steel hunters (SH)
+      @param8 = ignore collector's vehicles (SH)
+````
+
+Functions:
+
+```python 
+# when param is set to True vehicle type will be ignored in comparison
+readGame(wot="D:/World_of_Tanks_EU", igr=True, bot=True, bob=True, fl=True, sh=False, collector=False):
+Compare( data, layout='_jbDefault' )
+```
+getTanks repport for current game version is required to succesfully run this program.
+
+------
+
+#### ``` xml_export.py ``` 
+
+Exports development layout data into game folder & into release GitHub
+Can work both as a module or standalone
+
+Functions:
+
+```python
+main(source = './xml/', wot = "D:/World_of_Tanks_EU", name = '_jbDefault', cmd = None):
+```
+if cmd is not None program will override layout data in release version
+
+------
+
+#### ``` xml_report.py ```
+
+Layout specific xml_compare
+- jbDefault: does not ignore Steel Hunters Vehicles
+- KukieJar: ignore collector's vehicles
 
 

@@ -1,6 +1,18 @@
 # Ignore random files
+
+# Build py file
 _*
+
+# build folder crap
 ./build/*
-*.pyc
-*.npp
 meta.xml
+
+# compiled python files
+*.pyc
+
+# notepad++ sessions
+*.npp
+
+# shortcuts
+*.lnk
+
