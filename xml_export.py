@@ -6,9 +6,9 @@ def copyXML(SOURCE, destPath):
         if file.endswith(".xml"):
             shutil.copy2(os.path.join(SOURCE,file),destPath)
     
-def main(SOURCE = './xml/', WOT = "D:/World_of_Tanks_EU", name='_jbDefault'):
-    print "---    XML Export to game    ----"
-    print SOURCE, ">>", WOT, "  -  ", name
+def main(SOURCE = './xml/', WOT = "D:/World_of_Tanks_EU", name='_jbDefault', cmd = None):
+    print "---    XML Export to game    ----\n", SOURCE, ">>", WOT, "  -  ", name
+    if cmd == None: cmd = raw_input("> RELEASE XML files?")
 
     # Copy files in game
     destPath = WOT +'/mods/configs/techtree/xml/dev/'
@@ -18,7 +18,6 @@ def main(SOURCE = './xml/', WOT = "D:/World_of_Tanks_EU", name='_jbDefault'):
     copyXML(SOURCE,destPath)
     
     # release XML files 
-    cmd = raw_input("> RELEASE XML files?")
     if len(cmd):
         destPath = '../techtreeRelease/{}{}'.format(SOURCE[2:],name)
         if not os.path.exists(destPath):
