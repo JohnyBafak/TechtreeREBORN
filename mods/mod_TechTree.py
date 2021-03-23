@@ -1,10 +1,8 @@
-﻿__version__ = "0.5.4"
-UIv = 21
-print "[LOADMOD] (aTechTree) v.{}# {}".format(__version__,UIv, "21-03-15")
-""" 
- Advanced TechTree by Johny_Bafak
- http://forum.worldoftanks.eu/index.php?/topic/514277-
-"""
+﻿__version__ = "0.5.5"
+UIv = 22
+print "[LOADMOD] (aTechTree) v.{}# {}".format(__version__,UIv, "21-03-22")
+""" Advanced TechTree by Johny_Bafak http://forum.worldoftanks.eu/index.php?/topic/514277- """
+
 # Common
 import inspect, functools, os, zipfile, urllib
 import ResMgr, BigWorld, nations
@@ -27,11 +25,12 @@ from gui.Scaleform.daapi.view.lobby.techtree.techtree_page import TechTree
 from gui.Scaleform.daapi.view.lobby.techtree.data import NationTreeData, ResearchItemsData
 from gui.Scaleform.genConsts.NODE_STATE_FLAGS import NODE_STATE_FLAGS
 import gui.Scaleform.daapi.view.lobby.techtree.settings as SETT
+
+# Global variables
 CONFIG = {}
 LAYOUTS = []
-"""         Common utils:
-                @override               override standart function
-"""
+
+# Common utils - override method
 def override(obj, prop, getter=None, setter=None, deleter=None):
     if inspect.isclass(obj) and prop.startswith('__') and prop not in dir(obj) + dir(type(obj)):
         prop = obj.__name__ + prop
@@ -64,9 +63,8 @@ def override(obj, prop, getter=None, setter=None, deleter=None):
 """         Preview for all tanks:
                 @gui.share.gui_items.Vehicle.isPreviewAllowed
 """
+# gui.shared.gui_items.Vehicle:Vehicle - check if tank model exists then allow preview for all vehicles
 def isPreviewAllowed(self, x = None):
-    """ allow preview for all tank models in game """
-    #get vehicle name
     nat, name = self.name.split(':')
     xmlPath = 'scripts/item_defs/vehicles/%s/%s.xml' % (nat, name) 
     ResMgr.purge(xmlPath)    
@@ -86,37 +84,37 @@ Vehicle.isPreviewAllowed = isPreviewAllowed
                var gui.game_control.veh_comparison_basket._COMPARE_INVALID_CRITERIA 
                @to-do unlock all parameters
 """
+# gui.game_control.veh_comparison_basket - change global variable flags to allow all vehicles except those in battle
 gui.game_control.veh_comparison_basket._COMPARE_INVALID_CRITERIA = ~REQ_CRITERIA.VEHICLE.EVENT_BATTLE
 
 """         Techtree functionality:
-                load all tanks
-                update node data for all vehicles
-                fix research page crash
-
+                techtree main class handling all sorts of actions needed to extend techtree
 """
 class aTechTree():
-    
     def __init__(self):
-        """ aTechTree main function class """
-        
+        # Allow all vehicles in techtree & crash fix
         override(NationTreeData, 'load', self.load)                                     # Add all nodes
         override(NationTreeData, '_makeRealExposedNode', self._makeRealExposedNode)     # Node display info
         override(TechTree, 'goToNextVehicle', self.goToNextVehicle)                     # Reseasch page crash
-        # error handle
+        
+        # Layout changing support - global override of XML paths for g_techTreeDP
         import gui.Scaleform.daapi.view.lobby.techtree.techtree_dp as TT_dp
-        print TT_dp.TREE_SHARED_REL_FILE_PATH
-        TT_dp.TREE_SHARED_REL_FILE_PATH = "../mods/configs/techtree/xml/{}/tree-shared.xml".format( LAYOUTS[ CONFIG.get('layout') ] )
-        print TT_dp.TREE_SHARED_REL_FILE_PATH
+        TT_dp.TREE_SHARED_REL_FILE_PATH =           "../mods/configs/techtree/xml/{}/tree-shared.xml".format( LAYOUTS[ CONFIG.get('layout') ] )
+        TT_dp.NATION_TREE_REL_FILE_PATH =           "../mods/configs/techtree/xml/" + LAYOUTS[CONFIG.get('layout')] + "/{}-tree.xml"
+        TT_dp.NATION_TREE_REL_PREMIUM_FILE_PATH =   "../mods/configs/techtree/xml/" + LAYOUTS[CONFIG.get('layout')] + "/{}-premium.xml"
+        #override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNation', self._readNation)                #ONLY function handling nation XMLs
+        #override(TT_dp._TechTreeDataProvider,'getAvailableNations', self.getAvailableNations)                      #handle TREE_SHARED path
+        #override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readDefaultLine', self._readDefaultLine)      #handle TREE_SHARED path
+        #override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readShared', self._readDefaultLine)           #handle TREE_SHARED path
+        #override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readSharedMetrics', self._readDefaultLine)    #handle TREE_SHARED path
+        
+        # XML error handling - informational
         override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNodeLines', self._readNodeLines)
         override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__getLineInfo', self._getLineInfo)
         override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNodeList', self._readNodeList)
-        override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readNation', self._readNation)
-        #tree-share path
-        override(TT_dp._TechTreeDataProvider,'getAvailableNations', self.getAvailableNations)
-        override(TT_dp._TechTreeDataProvider,'_TechTreeDataProvider__readDefaultLine', self._readDefaultLine)
     
     def load(hook, baseFunc, self, nationID, override = None):
-        """ techtree.data.NationTreeData.load """
+        # techtree.data.NationTreeData.load - Add all vehicles into techtree
         self.clear()
         g_techTreeDP.setOverride(override)
         g_techTreeDP.load()
@@ -136,8 +134,12 @@ class aTechTree():
                 if not CONFIG.get("showCollec"): 
                     continue
             elif item.isHidden:
-                if not CONFIG.get("showHidden"):
-                    continue           
+                if item.isPremium:
+                    if not CONFIG.get("showHidden"):
+                        continue           
+                else:
+                    if not CONFIG.get("showRemoved"):
+                        continue
             
             index = self._addNode(nodeCD, self._makeRealExposedNode(node, item, unlockStats, displayInfo))
             if nodeCD == selectedID:
@@ -149,7 +151,7 @@ class aTechTree():
             self._findActionNode(nationID)
     
     def _makeRealExposedNode(hook, baseFunc, self, node, guiItem, unlockStats, displayInfo):
-        """ techtree.data.NationTreeData._makeRealExposedNode """
+        # techtree.data.NationTreeData._makeRealExposedNode - set node states for hidden tanks
         data = baseFunc(self, node, guiItem, unlockStats, displayInfo)
         if guiItem.isHidden and not guiItem.isInInventory:
             #scripts\client\gui\Scaleform\genConsts\NODE_STATE_FLAGS.py
@@ -158,13 +160,13 @@ class aTechTree():
         return data
         
     def goToNextVehicle(hook, baseFunc, self, vehCD):
-        """ techtree.techtree_page.TechTree.goToNextVehicle """
+        # techtree.techtree_page.TechTree.goToNextVehicle - research page bug-fix
         item = self._data.getItem(int(vehCD))
         if item.isPreviewAllowed():
             baseFunc(self, vehCD)
         
     def _getLineInfo(hook, baseFunc, self, xmlCtx, lineName, nodeCD, outPin, inPin, lineShared):
-        """ techtree_dp """
+        # techtree_dp - XML error handle
         if CONFIG.get('sysMessage'):
             try:
                 res = baseFunc(self, xmlCtx, lineName, nodeCD, outPin, inPin, lineShared)
@@ -176,7 +178,7 @@ class aTechTree():
             return baseFunc(self, xmlCtx, lineName, nodeCD, outPin, inPin, lineShared)
             
     def _readNodeLines(hook, baseFunc, self, parentCD, nation, xmlCtx, section, shared):
-        """ techtree_dp """
+        # techtree_dp - XML error handle 
         if CONFIG.get('sysMessage'):
             try:
                 lines = baseFunc(self, parentCD, nation, xmlCtx, section, shared)
@@ -188,7 +190,7 @@ class aTechTree():
             return baseFunc(self, parentCD, nation, xmlCtx, section, shared)
             
     def _readNodeList(hook, baseFunc, self, shared, nation, xmlPath, clearCache=False):
-        """ techtree_dp """
+        # techtree_dp - XML error handle
         if CONFIG.get('sysMessage'):
             try:
                 displayInfo, displaySettings, gridSettings = baseFunc(self, shared, nation, xmlPath, clearCache)
@@ -199,8 +201,8 @@ class aTechTree():
         else:
             return baseFunc(self, shared, nation, xmlPath, clearCache)
     
-    def _readNation(hook, baseFunc, self, shared, nation, clearCache=False):
-        """ techtree_dp """
+    """def _readNation(hook, baseFunc, self, shared, nation, clearCache=False):
+        # techtree_dp - change path to XMLs
         try:
             xmlPath = "../mods/configs/techtree/xml/{}/{}-tree.xml".format( LAYOUTS[CONFIG.get('layout')], nation)
             ResMgr.purge(xmlPath)
@@ -216,10 +218,10 @@ class aTechTree():
             return displayInfo
         except Exception as err:
             print err
-            return {}  
+            return {}"""  
 
-    def getAvailableNations(hook, baseFunc, self):  
-        """ techtree_dp """
+    """def getAvailableNations(hook, baseFunc, self):  
+        # techtree_dp - change path to TREE_SHARED_REL_FILE_PATH
         import gui.Scaleform.daapi.view.lobby.techtree.techtree_dp as TT_dp
         print "getAvailableNations"
         print TT_dp.TREE_SHARED_REL_FILE_PATH
@@ -230,19 +232,12 @@ class aTechTree():
                 _xml.raiseWrongXml(None, TREE_SHARED, 'can not open or read')
             xmlCtx = (None, TREE_SHARED)
             self._TechTreeDataProvider__availableNations = self._TechTreeDataProvider__readAvailableNations(xmlCtx, section)
-        return self._TechTreeDataProvider__availableNations[:]
-        
-    def _readDefaultLine(hook, baseFunc, self, shared, xmlCtx, section):
-        import gui.Scaleform.daapi.view.lobby.techtree.techtree_dp as TT_dp
-        print "_readDefaultLine"
-        print TT_dp.TREE_SHARED_REL_FILE_PATH
-        baseFunc(self, shared, xmlCtx, section)
-        return
-    
+        return self._TechTreeDataProvider__availableNations[:]"""
+            
 def DB_upd(dbFile):
     try:
-        #urllib.urlretrieve ('https://github.com/JohnyBafak/techtreeRelease/raw/main/xml/xml.pkg', dbFile )
-        urllib.urlretrieve ('https://bit.ly/3vpK0LK', dbFile )
+        urllib.urlretrieve ('https://github.com/JohnyBafak/techtreeRelease/raw/main/xml/xml.pkg', dbFile )
+        #urllib.urlretrieve ('https://bit.ly/3vpK0LK', dbFile )
         print "(aTechTree): Downloading xml.pkg"
         if os.path.isfile( dbFile ):
             with zipfile.ZipFile(dbFile) as zf:
@@ -292,12 +287,14 @@ template  = {
     'UIver': UIv,
 	'column1': [
         { 'type': "Empty" },
-		
+		{ 'type': "Label", 'text': 'Techtree vehicle settings' },
 		{ 'type': 'CheckBox',   'varName': 'showHidden',    'value': True,  'text': 'Show hidden vehicles in techtree',
 		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
         { 'type': 'CheckBox',   'varName': 'showCollec',    'value': True,  'text': "Show collector's tanks in techtree",
 		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
         { 'type': 'CheckBox',   'varName': 'showEvent',     'value': True,  'text': "Show event tanks in techtree",
+		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
+        { 'type': 'CheckBox',   'varName': 'showRemoved',   'value': True,  'text': "Show removed tanks in techtree",
 		  'tooltip': '{HEADER}X{/HEADER}{BODY]s{/BODY]' },
         { 'type': "Empty" },
         { 'type': 'CheckBox',   'varName': 'dataUpdate',    'value': False,  'text': 'Allow techtree data update',
@@ -323,11 +320,11 @@ def onModSettingsChanged(newSettings):
     CONFIG.update(newSettings)
     print 'onModSettingsChanged', newSettings
     if 'layout' in newSettings:
-        print 'changin Tree-shared XML path'
+        print 'changin XML paths'
         import gui.Scaleform.daapi.view.lobby.techtree.techtree_dp as TT_dp
-        print TT_dp.TREE_SHARED_REL_FILE_PATH
         TT_dp.TREE_SHARED_REL_FILE_PATH = "../mods/configs/techtree/xml/{}/tree-shared.xml".format( LAYOUTS[ CONFIG.get('layout') ] )
-        print TT_dp.TREE_SHARED_REL_FILE_PATH
+        TT_dp.NATION_TREE_REL_FILE_PATH =           "../mods/configs/techtree/xml/" + LAYOUTS[CONFIG.get('layout')] + "/{}-tree.xml"
+        TT_dp.NATION_TREE_REL_PREMIUM_FILE_PATH =   "../mods/configs/techtree/xml/" + LAYOUTS[CONFIG.get('layout')] + "/{}-premium.xml"
     
 def onButtonClicked(varName, value):    
     print 'onButtonClicked', varName, value
