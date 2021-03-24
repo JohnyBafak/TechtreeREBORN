@@ -26,7 +26,7 @@ def getVersion(game):
         tree = ET.parse(game + '/paths.xml')
         VER = tree.find("Paths")[0].text.split('mods/')[1]
         
-def readGame(wot= "D:/World_of_Tanks_EU", igr = True, bot=True, bob = True, fl = True, sh = True, collector=False):
+def readGame(wot= "D:/World_of_Tanks_EU", igr = True, bot=True, bob = True, fl = True, sh = True, collector=False, removed=False, china=False):
     getVersion(wot)
     data = {nation: {} for nation in NATIONS}
     fname = '{}/mods/{}_tankList.csv'.format( wot, VER )
@@ -37,21 +37,24 @@ def readGame(wot= "D:/World_of_Tanks_EU", igr = True, bot=True, bob = True, fl =
                 X = line.rstrip().split(delim)
                 nat = X[0]
                 name = X[1]
-                if igr and name.endswith("_IGR"): continue
-                if bot:
-                    if "_bot" in name: continue
-                    elif "_bootcamp" in name: continue
-                    elif "_training" in name: continue
-                if bob:
-                    if name.endswith("_bob"): continue
-                    elif name.endswith("_fallout"): continue
-                if fl:
-                    if name.endswith("_FL"):    continue
-                if sh:
-                    if name.endswith("_SH"):    continue
-                if collector:
-                    if X[12] == "True": continue
                 
+                if "_bot" in name or "_bootcamp" in name or "_training" in name:
+                    if bot:     continue
+                elif name.endswith("_fallout") or name.endswith("_bob"): 
+                    if bob:     continue
+                elif name.endswith("_IGR"): 
+                    if igr:     continue
+                elif name.endswith("_FL"):
+                    if fl:      continue
+                elif name.endswith("_SH"):    
+                    if sh:      continue
+                elif X[12] == "True": 
+                    if collector:continue
+                elif X[9] == "True" and X[7] == "False":
+                    if removed: continue
+                elif name.endswith("_CN"):
+                    if china:   continue
+                    
                 val = { "lvl": X[5], "cls": X[6] , "gold": X[7] , "hid":X[9], "col":X[12] }
                 data[nat][name] = val
     else: raise IOError("[Errno 2] No such file or directory: '{}' Generate vehicle list using jb.getTank first".format(fname))
