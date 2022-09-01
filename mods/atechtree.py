@@ -19,7 +19,7 @@ _path = os.path.join('mods', 'configs', 'techtree')
 if not os.path.exists(_path): os.makedirs(_path)
 USER_SETTINGS_PATH = os.path.join('mods', 'configs', 'techtree', 'aTechTree.json')
 # UI template data
-_path = os.path.dirname(unicode(BigWorld.wg_getPreferencesFilePath(), 'utf-8', errors='ignore'))
+_path = os.path.dirname(BigWorld.wg_getPreferencesFilePath())
 if not os.path.exists(_path): os.makedirs(_path)
 TEMPLATE_PATH = os.path.join(_path, 'jb_atechtree.dat')
 
